@@ -1,5 +1,5 @@
-use serde::{Deserialize, Serialize};
 use crate::api::types::image_entity::ImageEntity;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ComicEpPictureEntity {

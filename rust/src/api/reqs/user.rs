@@ -83,12 +83,13 @@ pub async fn picacg_user_login(
 /// - 当 API 响应非 200 状态码时，返回错误信息。
 /// - 当响应体不是文本格式时，返回错误。
 #[frb]
+#[allow(clippy::too_many_arguments)]
 pub async fn picacg_user_register(
     email: String,
     password: String,
     name: String,
     birthday: String,
-    gender: String, // [m, f, bot]
+    gender: String,
     answer1: String,
     answer2: String,
     answer3: String,
@@ -163,9 +164,8 @@ pub async fn picacg_user_profile() -> Result<ProfileEntity, anyhow::Error> {
 
     match json["code"].as_i64() {
         Some(200) => {
-            let user_profile: ProfileEntity =
-                serde_json::from_value(json["data"]["user"].clone())
-                    .map_err(|e| anyhow::anyhow!("Failed to parse user profile: {}", e))?;
+            let user_profile: ProfileEntity = serde_json::from_value(json["data"]["user"].clone())
+                .map_err(|e| anyhow::anyhow!("Failed to parse user profile: {}", e))?;
             Ok(user_profile)
         }
         _ => Err(anyhow::anyhow!(json["message"].clone())),
@@ -216,7 +216,7 @@ mod tests {
     #[tokio::test]
     async fn test_picacg_login() {
         let result = picacg_user_login("email".to_string(), "password".to_string()).await;
-        assert_eq!(result.is_err(), true);
+        assert!(result.is_err());
     }
 
     #[tokio::test]
@@ -236,18 +236,18 @@ mod tests {
         )
         .await;
 
-        assert_eq!(result.is_err(), true);
+        assert!(result.is_err());
     }
 
     #[tokio::test]
     async fn test_picacg_user_profile() {
         let result = picacg_user_profile().await;
-        assert_eq!(result.is_err(), true);
+        assert!(result.is_err());
     }
 
     #[tokio::test]
     async fn test_picacg_user_punch_in() {
         let result = picacg_user_punch_in().await;
-        assert_eq!(result.is_err(), true);
+        assert!(result.is_err());
     }
 }

@@ -1,6 +1,6 @@
+use crate::api::types::image_entity::{avatar_default, ImageEntity};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-use crate::api::types::image_entity::{ImageEntity, avatar_default};
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]

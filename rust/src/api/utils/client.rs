@@ -138,40 +138,41 @@ pub async fn picacg_request(
     expect_body: Option<HttpExpectBody>,
 ) -> Result<HttpResponse, anyhow::Error> {
     let time = Local::now().timestamp().to_string();
-    let mut headers: Vec<(String, String)> = Vec::new();
-    headers.push(("api-key".to_string(), API_KEY.to_string()));
-    headers.push((
-        "accept".to_string(),
-        "application/vnd.picacomic.com.v1+json".to_string(),
-    ));
-    headers.push(("app-channel".to_string(), "2".to_string()));
-    headers.push(("time".to_string(), time.to_string()));
-    headers.push(("nonce".to_string(), NONCE.to_string()));
-    headers.push(("app-version".to_string(), "2.2.1.2.3.3".to_string()));
-    headers.push(("app-uuid".to_string(), "defaultUuid".to_string()));
-    headers.push(("app-platform".to_string(), "android".to_string()));
-    headers.push(("app-build-version".to_string(), "44".to_string()));
-    headers.push((
-        "Content-Type".to_string(),
-        "application/json; charset=UTF-8".to_string(),
-    ));
-    headers.push(("User-Agent".to_string(), "okhttp/3.8.1".to_string()));
-    headers.push(("image-quality".to_string(), "original".to_string()));
-
     let url = match url.starts_with("/") {
         true => url.trim_start_matches("/").to_owned(),
         false => url.to_owned(),
     };
 
-    headers.push((
-        "signature".to_string(),
-        hmac_hex(
-            DIGEST_KEY,
-            ("".to_string() + url.as_str() + time.as_str() + NONCE + method + API_KEY)
-                .to_lowercase()
-                .as_str(),
+    let mut headers: Vec<(String, String)> = vec![
+        ("api-key".to_string(), API_KEY.to_string()),
+        (
+            "accept".to_string(),
+            "application/vnd.picacomic.com.v1+json".to_string(),
         ),
-    ));
+        ("app-channel".to_string(), "2".to_string()),
+        ("time".to_string(), time.to_string()),
+        ("nonce".to_string(), NONCE.to_string()),
+        ("app-version".to_string(), "2.2.1.2.3.3".to_string()),
+        ("app-uuid".to_string(), "defaultUuid".to_string()),
+        ("app-platform".to_string(), "android".to_string()),
+        ("app-build-version".to_string(), "44".to_string()),
+        (
+            "Content-Type".to_string(),
+            "application/json; charset=UTF-8".to_string(),
+        ),
+        ("User-Agent".to_string(), "okhttp/3.8.1".to_string()),
+        ("image-quality".to_string(), "original".to_string()),
+        (
+            "signature".to_string(),
+            hmac_hex(
+                DIGEST_KEY,
+                ("".to_string() + url.as_str() + time.as_str() + NONCE + method + API_KEY)
+                    .to_lowercase()
+                    .as_str(),
+            ),
+        ),
+    ];
+
     let token = get_picacg_token();
     if !token.is_empty() {
         headers.push(("authorization".to_string(), token));
@@ -234,10 +235,10 @@ mod tests {
                     let json: Value = serde_json::from_str(&text).unwrap();
                     assert_eq!(json["code"], 400);
                 } else {
-                    assert!(false, "Expected text response");
+                    panic!("Expected text response");
                 }
             }
-            Err(err) => assert!(false, "{:?}", err),
+            Err(err) => panic!("{:?}", err),
         }
     }
 
@@ -267,10 +268,10 @@ mod tests {
                     assert_eq!(json["code"], 400);
                     assert_eq!(json["error"], "1004");
                 } else {
-                    assert!(false, "Expected text response");
+                    panic!("Expected text response");
                 }
             }
-            Err(err) => assert!(false, "{:?}", err),
+            Err(err) => panic!("{:?}", err),
         }
     }
 }

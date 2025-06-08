@@ -597,60 +597,59 @@ mod tests {
         },
         types::sort::Sort,
     };
-    
+
     #[tokio::test]
     async fn test_picacg_comic_random() {
         let result = picacg_comic_random().await;
-        assert_eq!(result.is_err(), true);
+        assert!(result.is_err());
     }
 
     #[tokio::test]
     async fn test_picacg_comic_page() {
         let result = picacg_comic_page(None, None, None, None, Sort::SORT_DEFAULT, 1).await;
-        assert_eq!(result.is_err(), true);
+        assert!(result.is_err());
     }
 
     #[tokio::test]
     async fn test_picacg_comic_info() {
         let result = picacg_comic_info("5b6bdf4558ed442d899486b7".to_string()).await;
-        assert_eq!(result.is_err(), true);
+        assert!(result.is_err());
     }
 
     #[tokio::test]
     async fn test_picacg_comic_eps() {
         let result = picacg_comic_eps("5b6bdf4558ed442d899486b7".to_string(), 1).await;
-        assert_eq!(result.is_err(), true);
+        assert!(result.is_err());
     }
 
     #[tokio::test]
     async fn test_picacg_comic_ep_pictures() {
         let result = picacg_comic_ep_pictures("5b6bdf4558ed442d899486b7".to_string(), 1, 1).await;
-        assert_eq!(result.is_err(), true);
+        assert!(result.is_err());
     }
 
     #[tokio::test]
     async fn test_picacg_comic_favourite() {
         let result = picacg_comic_favourite(Sort::SORT_DEFAULT, 1).await;
-        assert_eq!(result.is_err(), true);
+        assert!(result.is_err());
     }
 
     #[tokio::test]
     async fn test_picacg_comic_switch_like() {
         let result = picacg_comic_switch_like("5b6bdf4558ed442d899486b7".to_string()).await;
-        println!("{:#?}", result);
-        assert_eq!(result.is_err(), true);
+        assert!(result.is_err());
     }
 
     #[tokio::test]
     async fn test_picacg_comic_switch_favourite() {
         let result = picacg_comic_switch_favourite("5b6bdf4558ed442d899486b7".to_string()).await;
-        assert_eq!(result.is_err(), true);
+        assert!(result.is_err());
     }
 
     #[tokio::test]
     async fn test_picacg_comic_comments() {
         let result = picacg_comic_comments("5b6bdf4558ed442d899486b7".to_string(), 1).await;
-        assert_eq!(result.is_err(), true);
+        assert!(result.is_err());
     }
 
     #[tokio::test]
@@ -658,7 +657,7 @@ mod tests {
         let result =
             picacg_comic_post_comment("5b6bdf4558ed442d899486b7".to_string(), "love!".to_string())
                 .await;
-        assert_eq!(result.is_err(), true);
+        assert!(result.is_err());
     }
 
     #[tokio::test]
@@ -668,12 +667,12 @@ mod tests {
             "love child!".to_string(),
         )
         .await;
-        assert_eq!(result.is_err(), true);
+        assert!(result.is_err());
     }
 
     #[tokio::test]
     async fn test_picacg_comic_search() {
         let result = picacg_comic_search("test".to_string(), Sort::SORT_DEFAULT, 1, vec![]).await;
-        assert_eq!(result.is_err(), true);
+        assert!(result.is_err());
     }
 }

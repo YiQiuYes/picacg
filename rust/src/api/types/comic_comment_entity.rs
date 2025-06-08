@@ -1,5 +1,5 @@
-use serde::{Deserialize, Serialize};
 use crate::api::types::comment_user_entity::CommentUserEntity;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
