@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Rust
         uses: actions-rs/toolchain@v1
@@ -28,3 +28,38 @@ jobs:
       - name: Run Clippy
         working-directory: rust
         run: cargo clippy --all-targets --all-features -- -D warnings
+  
+  flutter:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'oracle'
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+
+      - name: Run Flutter Pub Get
+        run: flutter pub get
+
+      - name: Generate Flutter Code
+        run: |
+          cargo install flutter_rust_bridge_codegen
+          flutter_rust_bridge_codegen generate
+
+      - name: Check Flutter Code
+        run: dart format --set-exit-if-changed lib test
