@@ -1,0 +1,27 @@
+name: picacg
+description: "A new Flutter project."
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.7.2
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.8
+  rust_lib_picacg:
+    path: rust_builder
+  flutter_rust_bridge: ^2.10.0
+  freezed_annotation: ^3.0.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  freezed: ^3.0.6
+  build_runner: ^2.4.15
+  flutter_lints: ^5.0.0
+
+flutter:
+  uses-material-design: true
