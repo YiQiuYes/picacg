@@ -40,10 +40,10 @@ jobs:
         run: echo $SIGNING_KEY | base64 -d > android/app/key.jks
 
       - name: Set up Rust
-        uses: actions-rs/toolchain@v1
+        uses: dtolnay/rust-toolchain@v1
         with:
           toolchain: stable
-          override: true
+          components: 'clippy, rustfmt'
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
@@ -94,10 +94,10 @@ jobs:
           sed -i "" "s/version: .*/version: 1.0.0+1/" pubspec.yaml
 
       - name: Set up Rust
-        uses: actions-rs/toolchain@v1
+        uses: dtolnay/rust-toolchain@v1
         with:
           toolchain: stable
-          override: true
+          components: 'clippy, rustfmt'
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
