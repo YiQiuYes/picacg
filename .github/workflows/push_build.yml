@@ -54,6 +54,9 @@ jobs:
       - name: Run Flutter Pub Get
         run: flutter pub get
 
+      - name: Run Generate Language
+        run: flutter pub run intl_utils:generate
+
       - name: Generate Flutter Code
         run: |
           cargo install flutter_rust_bridge_codegen
@@ -104,6 +107,9 @@ jobs:
 
       - name: Run Flutter Pub Get
         run: flutter pub get
+
+      - name: Run Generate Language
+        run: flutter pub run intl_utils:generate
 
       - name: Generate Flutter Code
         run: |
