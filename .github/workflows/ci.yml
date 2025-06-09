@@ -63,6 +63,9 @@ jobs:
       - name: Run Flutter Pub Get
         run: flutter pub get
 
+      - name: Check Flutter Code
+        run: dart format --set-exit-if-changed lib test
+
       - name: Run Generate Language
         run: flutter pub run intl_utils:generate
 
@@ -71,5 +74,5 @@ jobs:
           cargo install flutter_rust_bridge_codegen
           flutter_rust_bridge_codegen generate
 
-      - name: Check Flutter Code
-        run: dart format --set-exit-if-changed lib test
+      - name: Run Flutter Analysis
+        run: flutter analyze lib
