@@ -47,5 +47,6 @@ app.*.map.json
 # Rust generated files
 lib/rust/
 
-# Flutter Intl generated files
+# Flutter generated files
 lib/language/generated/
+lib/**/*.g.dart

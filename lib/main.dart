@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:picacg/language/generated/l10n.dart';
 import 'package:picacg/rust/frb_generated.dart';
 import 'package:picacg/router/route_config.dart';
+import 'package:responsive_framework/responsive_framework.dart';
 
 Future<void> main() async {
   await RustLib.init();
@@ -31,6 +32,16 @@ class MyApp extends StatelessWidget {
         return const Locale('zh');
       },
       routerConfig: RouteConfig.router,
+      builder: (context, child) {
+        return ResponsiveBreakpoints.builder(
+          child: child!,
+          breakpoints: [
+            const Breakpoint(start: 0, end: 600, name: MOBILE),
+            const Breakpoint(start: 601, end: 840, name: 'FOLDED'),
+            const Breakpoint(start: 841, end: double.infinity, name: TABLET),
+          ],
+        );
+      },
     );
   }
 }
