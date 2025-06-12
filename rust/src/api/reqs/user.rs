@@ -1,32 +1,38 @@
-use crate::api::types::profile_entity::ProfileEntity;
 use crate::api::{
-    types::login_entity::LoginEntity,
-    utils::client::{picacg_request, HttpExpectBody, HttpResponseBody},
+    error::custom_error::{CustomError, CustomErrorType},
+    types::{login_entity::LoginEntity, profile_entity::ProfileEntity},
+    utils::{
+        client::{picacg_request, HttpExpectBody},
+        parse_json::parse_json_from_text,
+    },
 };
-use flutter_rust_bridge::{for_generated::anyhow, frb};
-use serde_json::Value;
+use flutter_rust_bridge::frb;
 
 /// 登录到 Picacg 平台。
 ///
 /// # 参数
-/// - `username`：用户邮箱或用户名。
+/// - `username`：用户邮箱。
 /// - `password`：用户密码。
 ///
 /// # 返回
 /// - `Ok(LoginEntity)`：登录成功，返回登录实体。
-/// - `Err(anyhow::Error)`：登录失败，返回错误信息。
+/// - `Err(CustomError)`：登录失败，返回错误信息。
 ///
 /// # 错误
-/// - 当用户名或密码为空时，返回错误。
-/// - 当 API 响应非 200 状态码时，返回错误信息。
-/// - 当响应体不是文本格式时，返回错误。
+/// - 当用户名或密码为空时，返回参数错误。
+/// - 当 API 请求失败时，返回请求错误。
+/// - 当响应体不是文本格式时，返回格式错误。
+/// - 当解析登录实体失败时，返回解析错误。
 #[frb]
 pub async fn picacg_user_login(
     username: String,
     password: String,
-) -> Result<LoginEntity, anyhow::Error> {
+) -> Result<LoginEntity, CustomError> {
     if username.is_empty() || password.is_empty() {
-        return Err(anyhow::anyhow!("Username or password cannot be empty"));
+        return Err(CustomError {
+            error_code: CustomErrorType::ParameterError,
+            error_message: "Username or password cannot be empty".to_string(),
+        });
     }
 
     let response = picacg_request(
@@ -42,22 +48,22 @@ pub async fn picacg_user_login(
         None,
         Some(HttpExpectBody::Text),
     )
-    .await?;
+    .await
+    .map_err(|e| CustomError {
+        error_code: CustomErrorType::BadRequest,
+        error_message: format!("Failed to make request: {}", e),
+    })?;
 
-    if let HttpResponseBody::Text(text) = response.body {
-        let json: Value = serde_json::from_str(&text)?;
-
-        match json["code"].as_i64() {
-            Some(200) => {
-                let login_entity: LoginEntity = serde_json::from_value(json["data"].clone())
-                    .map_err(|e| anyhow::anyhow!("Failed to parse login entity: {}", e))?;
-                Ok(login_entity)
-            }
-            _ => Err(anyhow::anyhow!(json["message"].clone())),
-        }
-    } else {
-        Err(anyhow::anyhow!("login api result expected text response"))
-    }
+    parse_json_from_text(
+        response.body,
+        |json| {
+            serde_json::from_value(json["data"].clone()).map_err(|e| CustomError {
+                error_code: CustomErrorType::ParseJsonError,
+                error_message: format!("Failed to parse login entity: {}", e),
+            })
+        },
+        "login api result expected text response".to_string(),
+    )
 }
 
 /// 注册到 Picacg 平台。
@@ -77,7 +83,7 @@ pub async fn picacg_user_login(
 ///
 /// # 返回
 /// - `Ok(true)`：注册成功。
-/// - `Err(anyhow::Error)`：注册失败，返回错误信息。
+/// - `Err(CustomError)`：注册失败，返回错误信息。
 ///
 /// # 错误
 /// - 当 API 响应非 200 状态码时，返回错误信息。
@@ -96,7 +102,7 @@ pub async fn picacg_user_register(
     question1: String,
     question2: String,
     question3: String,
-) -> Result<bool, anyhow::Error> {
+) -> Result<bool, CustomError> {
     let response = picacg_request(
         "POST",
         "/auth/register",
@@ -119,35 +125,31 @@ pub async fn picacg_user_register(
         None,
         Some(HttpExpectBody::Text),
     )
-    .await?;
+    .await
+    .map_err(|e| CustomError {
+        error_code: CustomErrorType::BadRequest,
+        error_message: format!("Failed to make request: {}", e),
+    })?;
 
-    let json: Value = match response.body {
-        HttpResponseBody::Text(text) => serde_json::from_str(&text)?,
-        _ => {
-            return Err(anyhow::anyhow!(
-                "register api result expected text response"
-            ))
-        }
-    };
-
-    match json["code"].as_i64() {
-        Some(200) => Ok(true),
-        _ => Err(anyhow::anyhow!(json["message"].clone())),
-    }
+    parse_json_from_text(
+        response.body,
+        |_json| Ok(true),
+        "register api result expected text response".to_string(),
+    )
 }
 
 /// 获取 Picacg 平台的用户个人资料。
 ///
 /// # 返回
 /// - `Ok(UserProfileEntity)`：获取成功，返回用户资料实体。
-/// - `Err(anyhow::Error)`：获取失败，返回错误信息。
+/// - `Err(CustomError)`：获取失败，返回错误信息。
 ///
 /// # 错误
 /// - 当 API 响应非 200 状态码时，返回错误信息。
 /// - 当响应体不是文本格式时，返回错误。
 /// - 当解析用户资料失败时，返回错误。
 #[frb]
-pub async fn picacg_user_profile() -> Result<ProfileEntity, anyhow::Error> {
+pub async fn picacg_user_profile() -> Result<ProfileEntity, CustomError> {
     let response = picacg_request(
         "GET",
         "/users/profile",
@@ -155,34 +157,35 @@ pub async fn picacg_user_profile() -> Result<ProfileEntity, anyhow::Error> {
         None,
         Some(HttpExpectBody::Text),
     )
-    .await?;
+    .await
+    .map_err(|e| CustomError {
+        error_code: CustomErrorType::BadRequest,
+        error_message: format!("Failed to make request: {}", e),
+    })?;
 
-    let json: Value = match response.body {
-        HttpResponseBody::Text(text) => serde_json::from_str(&text)?,
-        _ => return Err(anyhow::anyhow!("profile api result expected text response")),
-    };
-
-    match json["code"].as_i64() {
-        Some(200) => {
-            let user_profile: ProfileEntity = serde_json::from_value(json["data"]["user"].clone())
-                .map_err(|e| anyhow::anyhow!("Failed to parse user profile: {}", e))?;
-            Ok(user_profile)
-        }
-        _ => Err(anyhow::anyhow!(json["message"].clone())),
-    }
+    parse_json_from_text(
+        response.body,
+        |json| {
+            serde_json::from_value(json["data"]["user"].clone()).map_err(|e| CustomError {
+                error_code: CustomErrorType::ParseJsonError,
+                error_message: format!("Failed to parse user profile: {}", e),
+            })
+        },
+        "profile api result expected text response".to_string(),
+    )
 }
 
 /// 用户每日签到（打卡）Picacg 平台。
 ///
 /// # 返回
 /// - `Ok(true)`：签到成功。
-/// - `Err(anyhow::Error)`：签到失败，返回错误信息。
+/// - `Err(CustomError)`：签到失败，返回错误信息。
 ///
 /// # 错误
 /// - 当 API 响应非 200 状态码时，返回错误信息。
 /// - 当响应体不是文本格式时，返回错误。
 #[frb]
-pub async fn picacg_user_punch_in() -> Result<bool, anyhow::Error> {
+pub async fn picacg_user_punch_in() -> Result<bool, CustomError> {
     let response = picacg_request(
         "POST",
         "/users/punch-in",
@@ -190,21 +193,17 @@ pub async fn picacg_user_punch_in() -> Result<bool, anyhow::Error> {
         None,
         Some(HttpExpectBody::Text),
     )
-    .await?;
+    .await
+    .map_err(|e| CustomError {
+        error_code: CustomErrorType::BadRequest,
+        error_message: format!("Failed to make request: {}", e),
+    })?;
 
-    let json: Value = match response.body {
-        HttpResponseBody::Text(text) => serde_json::from_str(&text)?,
-        _ => {
-            return Err(anyhow::anyhow!(
-                "punch-in api result expected text response"
-            ))
-        }
-    };
-
-    match json["code"].as_i64() {
-        Some(200) => Ok(true),
-        _ => Err(anyhow::anyhow!(json["message"].clone())),
-    }
+    parse_json_from_text(
+        response.body,
+        |_json| Ok(true),
+        "punch-in api result expected text response".to_string(),
+    )
 }
 
 #[cfg(test)]
@@ -235,7 +234,6 @@ mod tests {
             "question3".to_string(),
         )
         .await;
-
         assert!(result.is_err());
     }
 

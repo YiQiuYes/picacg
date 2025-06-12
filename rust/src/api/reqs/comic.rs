@@ -1,4 +1,5 @@
 use crate::api::{
+    error::custom_error::{CustomError, CustomErrorType},
     types::{
         action_entity::ActionEntity,
         comic_comment_entity::ComicCommentEntity,
@@ -13,10 +14,12 @@ use crate::api::{
         },
         sort::Sort,
     },
-    utils::client::{picacg_request, HttpExpectBody, HttpResponseBody},
+    utils::{
+        client::{picacg_request, HttpExpectBody},
+        parse_json::parse_json_from_text,
+    },
 };
-use flutter_rust_bridge::{for_generated::anyhow, frb};
-use serde_json::Value;
+use flutter_rust_bridge::frb;
 
 /// 获取随机漫画列表。
 ///
@@ -25,9 +28,9 @@ use serde_json::Value;
 ///
 /// # 返回
 /// - `Ok(Vec<ComicEntity>)`：请求成功并解析成功时返回漫画实体列表。
-/// - `Err(anyhow::Error)`：请求失败或解析失败时返回错误信息。
+/// - `Err(CustomError)`：请求失败或解析失败时返回错误信息。
 #[frb]
-pub async fn picacg_comic_random() -> Result<Vec<ComicEntity>, anyhow::Error> {
+pub async fn picacg_comic_random() -> Result<Vec<ComicEntity>, CustomError> {
     let response = picacg_request(
         "GET",
         "/comics/random",
@@ -35,22 +38,22 @@ pub async fn picacg_comic_random() -> Result<Vec<ComicEntity>, anyhow::Error> {
         None,
         Some(HttpExpectBody::Text),
     )
-    .await?;
+    .await
+    .map_err(|e| CustomError {
+        error_code: CustomErrorType::BadRequest,
+        error_message: format!("Failed to make request: {}", e),
+    })?;
 
-    let json: Value = match response.body {
-        HttpResponseBody::Text(text) => serde_json::from_str(&text)?,
-        _ => return Err(anyhow::anyhow!("random api result expected text response")),
-    };
-
-    match json["code"].as_i64() {
-        Some(200) => {
-            let comics: Vec<ComicEntity> =
-                serde_json::from_value(json["data"]["comics"].clone())
-                    .map_err(|e| anyhow::anyhow!("Failed to parse comic entity: {}", e))?;
-            Ok(comics)
-        }
-        _ => Err(anyhow::anyhow!(json["message"].clone())),
-    }
+    parse_json_from_text(
+        response.body,
+        |json| {
+            serde_json::from_value(json["data"]["comics"].clone()).map_err(|e| CustomError {
+                error_code: CustomErrorType::ParseError,
+                error_message: format!("Failed to parse comic entity: {}", e),
+            })
+        },
+        "random api result expected text response".to_string(),
+    )
 }
 
 /// 获取漫画分页列表。
@@ -68,7 +71,7 @@ pub async fn picacg_comic_random() -> Result<Vec<ComicEntity>, anyhow::Error> {
 ///
 /// # 返回
 /// - `Ok(ComicPageData)`：请求成功并解析成功时返回分页数据
-/// - `Err(anyhow::Error)`：请求失败或解析失败时返回错误信息
+/// - `Err(CustomError)`：请求失败或解析失败时返回错误信息
 #[frb]
 pub async fn picacg_comic_page(
     category: Option<String>,
@@ -77,7 +80,7 @@ pub async fn picacg_comic_page(
     chinese_team: Option<String>,
     sort: Sort,
     page: i32,
-) -> Result<ComicPageData, anyhow::Error> {
+) -> Result<ComicPageData, CustomError> {
     let mut query_params = Vec::new();
     if let Some(category) = category {
         query_params.push(("c".to_string(), category));
@@ -111,26 +114,28 @@ pub async fn picacg_comic_page(
         );
     }
 
-    let response = picacg_request("GET", &url, None, None, Some(HttpExpectBody::Text)).await?;
+    let response = picacg_request("GET", &url, None, None, Some(HttpExpectBody::Text))
+        .await
+        .map_err(|e| CustomError {
+            error_code: CustomErrorType::BadRequest,
+            error_message: format!("Failed to make request: {}", e),
+        })?;
 
-    let json: Value = match response.body {
-        HttpResponseBody::Text(text) => serde_json::from_str(&text)?,
-        _ => {
-            return Err(anyhow::anyhow!(
-                "comic page api result expected text response"
-            ))
-        }
-    };
-
-    match json["code"].as_i64() {
-        Some(200) => {
+    parse_json_from_text(
+        response.body,
+        |json| {
             let page_data: PageData<ComicEntity> =
-                serde_json::from_value(json["data"]["comics"].clone())
-                    .map_err(|e| anyhow::anyhow!("Failed to parse comic page data: {}", e))?;
+                serde_json::from_value(json["data"]["comics"].clone()).map_err(|e| {
+                    CustomError {
+                        error_code: CustomErrorType::ParseError,
+                        error_message: format!("Failed to parse comic page data: {}", e),
+                    }
+                })?;
+
             Ok(ComicPageData::from(page_data))
-        }
-        _ => Err(anyhow::anyhow!(json["message"].clone())),
-    }
+        },
+        "comic page api result expected text response".to_string(),
+    )
 }
 
 /// 获取指定漫画的详细信息。
@@ -143,9 +148,9 @@ pub async fn picacg_comic_page(
 ///
 /// # 返回
 /// - `Ok(ComicInfoEntity)`：请求成功并解析成功时返回漫画详细信息。
-/// - `Err(anyhow::Error)`：请求失败或解析失败时返回错误信息。
+/// - `Err(CustomError)`：请求失败或解析失败时返回错误信息。
 #[frb]
-pub async fn picacg_comic_info(comic_id: String) -> Result<ComicInfoEntity, anyhow::Error> {
+pub async fn picacg_comic_info(comic_id: String) -> Result<ComicInfoEntity, CustomError> {
     let response = picacg_request(
         "GET",
         &format!("/comics/{}", comic_id),
@@ -153,25 +158,22 @@ pub async fn picacg_comic_info(comic_id: String) -> Result<ComicInfoEntity, anyh
         None,
         Some(HttpExpectBody::Text),
     )
-    .await?;
+    .await
+    .map_err(|e| CustomError {
+        error_code: CustomErrorType::BadRequest,
+        error_message: format!("Failed to make request: {}", e),
+    })?;
 
-    let json: Value = match response.body {
-        HttpResponseBody::Text(text) => serde_json::from_str(&text)?,
-        _ => {
-            return Err(anyhow::anyhow!(
-                "comic info api result expected text response"
-            ))
-        }
-    };
-
-    match json["code"].as_i64() {
-        Some(200) => {
-            let comic_info: ComicInfoEntity = serde_json::from_value(json["data"]["comic"].clone())
-                .map_err(|e| anyhow::anyhow!("Failed to parse comic info entity: {}", e))?;
-            Ok(comic_info)
-        }
-        _ => Err(anyhow::anyhow!(json["message"].clone())),
-    }
+    parse_json_from_text(
+        response.body,
+        |json| {
+            serde_json::from_value(json["data"]["comic"].clone()).map_err(|e| CustomError {
+                error_code: CustomErrorType::ParseError,
+                error_message: format!("Failed to parse comic info entity: {}", e),
+            })
+        },
+        "comic info api result expected text response".to_string(),
+    )
 }
 
 /// 获取指定漫画的章节分页列表。
@@ -185,12 +187,9 @@ pub async fn picacg_comic_info(comic_id: String) -> Result<ComicInfoEntity, anyh
 ///
 /// # 返回
 /// - `Ok(ComicEpPageData)`：请求成功并解析成功时返回章节分页数据。
-/// - `Err(anyhow::Error)`：请求失败或解析失败时返回错误信息。
+/// - `Err(CustomError)`：请求失败或解析失败时返回错误信息。
 #[frb]
-pub async fn picacg_comic_eps(
-    comic_id: String,
-    page: i32,
-) -> Result<ComicEpPageData, anyhow::Error> {
+pub async fn picacg_comic_eps(comic_id: String, page: i32) -> Result<ComicEpPageData, CustomError> {
     let response = picacg_request(
         "GET",
         &format!("/comics/{}/eps?page={}", comic_id, page),
@@ -198,26 +197,25 @@ pub async fn picacg_comic_eps(
         None,
         Some(HttpExpectBody::Text),
     )
-    .await?;
+    .await
+    .map_err(|e| CustomError {
+        error_code: CustomErrorType::BadRequest,
+        error_message: format!("Failed to make request: {}", e),
+    })?;
 
-    let json: Value = match response.body {
-        HttpResponseBody::Text(text) => serde_json::from_str(&text)?,
-        _ => {
-            return Err(anyhow::anyhow!(
-                "comic eps api result expected text response"
-            ))
-        }
-    };
-
-    match json["code"].as_i64() {
-        Some(200) => {
+    parse_json_from_text(
+        response.body,
+        |json| {
             let page_data: PageData<ComicEpEntity> =
-                serde_json::from_value(json["data"]["eps"].clone())
-                    .map_err(|e| anyhow::anyhow!("Failed to parse comic eps data: {}", e))?;
+                serde_json::from_value(json["data"]["eps"].clone()).map_err(|e| CustomError {
+                    error_code: CustomErrorType::ParseError,
+                    error_message: format!("Failed to parse comic eps data: {}", e),
+                })?;
+
             Ok(ComicEpPageData::from(page_data))
-        }
-        _ => Err(anyhow::anyhow!(json["message"].clone())),
-    }
+        },
+        "comic eps api result expected text response".to_string(),
+    )
 }
 
 /// 获取指定漫画某一章节的图片分页列表。
@@ -232,13 +230,13 @@ pub async fn picacg_comic_eps(
 ///
 /// # 返回
 /// - `Ok(ComicEpPicturePageData)`：请求成功并解析成功时返回章节图片分页数据。
-/// - `Err(anyhow::Error)`：请求失败或解析失败时返回错误信息。
+/// - `Err(CustomError)`：请求失败或解析失败时返回错误信息。
 #[frb]
 pub async fn picacg_comic_ep_pictures(
     comic_id: String,
     ep_order: i32,
     page: i32,
-) -> Result<ComicEpPicturePageData, anyhow::Error> {
+) -> Result<ComicEpPicturePageData, CustomError> {
     let response = picacg_request(
         "GET",
         &format!(
@@ -249,27 +247,25 @@ pub async fn picacg_comic_ep_pictures(
         None,
         Some(HttpExpectBody::Text),
     )
-    .await?;
+    .await
+    .map_err(|e| CustomError {
+        error_code: CustomErrorType::BadRequest,
+        error_message: format!("Failed to make request: {}", e),
+    })?;
 
-    let json: Value = match response.body {
-        HttpResponseBody::Text(text) => serde_json::from_str(&text)?,
-        _ => {
-            return Err(anyhow::anyhow!(
-                "comic ep pictures api result expected text response"
-            ))
-        }
-    };
-
-    match json["code"].as_i64() {
-        Some(200) => {
+    parse_json_from_text(
+        response.body,
+        |json| {
             let page_data: PageData<ComicEpPictureEntity> =
-                serde_json::from_value(json["data"]["pages"].clone()).map_err(|e| {
-                    anyhow::anyhow!("Failed to parse comic ep pictures data: {}", e)
+                serde_json::from_value(json["data"]["pages"].clone()).map_err(|e| CustomError {
+                    error_code: CustomErrorType::ParseError,
+                    error_message: format!("Failed to parse comic ep pictures data: {}", e),
                 })?;
+
             Ok(ComicEpPicturePageData::from(page_data))
-        }
-        _ => Err(anyhow::anyhow!(json["message"].clone())),
-    }
+        },
+        "comic ep pictures api result expected text response".to_string(),
+    )
 }
 
 /// 获取用户收藏的漫画分页列表。
@@ -284,9 +280,9 @@ pub async fn picacg_comic_ep_pictures(
 ///
 /// # 返回
 /// - `Ok(ComicPageData)`：请求成功并解析成功时返回收藏漫画的分页数据
-/// - `Err(anyhow::Error)`：请求失败或解析失败时返回错误信息
+/// - `Err(CustomError)`：请求失败或解析失败时返回错误信息
 #[frb]
-pub async fn picacg_comic_favourite(sort: Sort, page: i32) -> Result<ComicPageData, anyhow::Error> {
+pub async fn picacg_comic_favourite(sort: Sort, page: i32) -> Result<ComicPageData, CustomError> {
     let response = picacg_request(
         "GET",
         &format!("/users/favourite?s={}&page={}", sort.as_str(), page),
@@ -294,26 +290,27 @@ pub async fn picacg_comic_favourite(sort: Sort, page: i32) -> Result<ComicPageDa
         None,
         Some(HttpExpectBody::Text),
     )
-    .await?;
+    .await
+    .map_err(|e| CustomError {
+        error_code: CustomErrorType::BadRequest,
+        error_message: format!("Failed to make request: {}", e),
+    })?;
 
-    let json: Value = match response.body {
-        HttpResponseBody::Text(text) => serde_json::from_str(&text)?,
-        _ => {
-            return Err(anyhow::anyhow!(
-                "comic favourite api result expected text response"
-            ))
-        }
-    };
-
-    match json["code"].as_i64() {
-        Some(200) => {
+    parse_json_from_text(
+        response.body,
+        |json| {
             let page_data: PageData<ComicEntity> =
-                serde_json::from_value(json["data"]["comics"].clone())
-                    .map_err(|e| anyhow::anyhow!("Failed to parse comic favourite data: {}", e))?;
+                serde_json::from_value(json["data"]["comics"].clone()).map_err(|e| {
+                    CustomError {
+                        error_code: CustomErrorType::ParseError,
+                        error_message: format!("Failed to parse comic favourite data: {}", e),
+                    }
+                })?;
+
             Ok(ComicPageData::from(page_data))
-        }
-        _ => Err(anyhow::anyhow!(json["message"].clone())),
-    }
+        },
+        "comic favourite api result expected text response".to_string(),
+    )
 }
 
 /// 切换指定漫画的点赞状态（Like/Unlike）。
@@ -326,9 +323,9 @@ pub async fn picacg_comic_favourite(sort: Sort, page: i32) -> Result<ComicPageDa
 ///
 /// # 返回
 /// - `Ok(ActionEntity)`：请求成功并解析成功时返回操作结果实体。
-/// - `Err(anyhow::Error)`：请求失败或解析失败时返回错误信息。
+/// - `Err(CustomError)`：请求失败或解析失败时返回错误信息。
 #[frb]
-pub async fn picacg_comic_switch_like(comic_id: String) -> Result<ActionEntity, anyhow::Error> {
+pub async fn picacg_comic_switch_like(comic_id: String) -> Result<ActionEntity, CustomError> {
     let response = picacg_request(
         "POST",
         &format!("/comics/{}/like", comic_id),
@@ -336,25 +333,22 @@ pub async fn picacg_comic_switch_like(comic_id: String) -> Result<ActionEntity, 
         None,
         Some(HttpExpectBody::Text),
     )
-    .await?;
+    .await
+    .map_err(|e| CustomError {
+        error_code: CustomErrorType::BadRequest,
+        error_message: format!("Failed to make request: {}", e),
+    })?;
 
-    let json: Value = match response.body {
-        HttpResponseBody::Text(text) => serde_json::from_str(&text)?,
-        _ => {
-            return Err(anyhow::anyhow!(
-                "switch like api result expected text response"
-            ))
-        }
-    };
-
-    match json["code"].as_i64() {
-        Some(200) => {
-            let action: ActionEntity = serde_json::from_value(json["data"].clone())
-                .map_err(|e| anyhow::anyhow!("Failed to parse action entity: {}", e))?;
-            Ok(action)
-        }
-        _ => Err(anyhow::anyhow!(json["message"].clone())),
-    }
+    parse_json_from_text(
+        response.body,
+        |json| {
+            serde_json::from_value(json["data"].clone()).map_err(|e| CustomError {
+                error_code: CustomErrorType::ParseError,
+                error_message: format!("Failed to parse action entity: {}", e),
+            })
+        },
+        "switch like api result expected text response".to_string(),
+    )
 }
 
 /// 切换指定漫画的收藏状态（收藏/取消收藏）。
@@ -367,11 +361,9 @@ pub async fn picacg_comic_switch_like(comic_id: String) -> Result<ActionEntity, 
 ///
 /// # 返回
 /// - `Ok(ActionEntity)`：请求成功并解析成功时返回操作结果实体。
-/// - `Err(anyhow::Error)`：请求失败或解析失败时返回错误信息。
+/// - `Err(CustomError)`：请求失败或解析失败时返回错误信息。
 #[frb]
-pub async fn picacg_comic_switch_favourite(
-    comic_id: String,
-) -> Result<ActionEntity, anyhow::Error> {
+pub async fn picacg_comic_switch_favourite(comic_id: String) -> Result<ActionEntity, CustomError> {
     let response = picacg_request(
         "POST",
         &format!("/comics/{}/favourite", comic_id),
@@ -379,25 +371,22 @@ pub async fn picacg_comic_switch_favourite(
         None,
         Some(HttpExpectBody::Text),
     )
-    .await?;
+    .await
+    .map_err(|e| CustomError {
+        error_code: CustomErrorType::BadRequest,
+        error_message: format!("Failed to make request: {}", e),
+    })?;
 
-    let json: Value = match response.body {
-        HttpResponseBody::Text(text) => serde_json::from_str(&text)?,
-        _ => {
-            return Err(anyhow::anyhow!(
-                "switch favourite api result expected text response"
-            ))
-        }
-    };
-
-    match json["code"].as_i64() {
-        Some(200) => {
-            let action: ActionEntity = serde_json::from_value(json["data"].clone())
-                .map_err(|e| anyhow::anyhow!("Failed to parse action entity: {}", e))?;
-            Ok(action)
-        }
-        _ => Err(anyhow::anyhow!(json["message"].clone())),
-    }
+    parse_json_from_text(
+        response.body,
+        |json| {
+            serde_json::from_value(json["data"].clone()).map_err(|e| CustomError {
+                error_code: CustomErrorType::ParseError,
+                error_message: format!("Failed to parse action entity: {}", e),
+            })
+        },
+        "switch favourite api result expected text response".to_string(),
+    )
 }
 
 /// 获取指定漫画的评论分页列表。
@@ -411,12 +400,12 @@ pub async fn picacg_comic_switch_favourite(
 ///
 /// # 返回
 /// - `Ok(ComicCommentPageData)`：请求成功并解析成功时返回评论分页数据。
-/// - `Err(anyhow::Error)`：请求失败或解析失败时返回错误信息。
+/// - `Err(CustomError)`：请求失败或解析失败时返回错误信息。
 #[frb]
 pub async fn picacg_comic_comments(
     comic_id: String,
     page: i32,
-) -> Result<ComicCommentPageData, anyhow::Error> {
+) -> Result<ComicCommentPageData, CustomError> {
     let response = picacg_request(
         "GET",
         &format!("/comics/{}/comments?page={}", comic_id, page),
@@ -424,26 +413,27 @@ pub async fn picacg_comic_comments(
         None,
         Some(HttpExpectBody::Text),
     )
-    .await?;
+    .await
+    .map_err(|e| CustomError {
+        error_code: CustomErrorType::BadRequest,
+        error_message: format!("Failed to make request: {}", e),
+    })?;
 
-    let json: Value = match response.body {
-        HttpResponseBody::Text(text) => serde_json::from_str(&text)?,
-        _ => {
-            return Err(anyhow::anyhow!(
-                "comic comments api result expected text response"
-            ))
-        }
-    };
-
-    match json["code"].as_i64() {
-        Some(200) => {
+    parse_json_from_text(
+        response.body,
+        |json| {
             let page_data: PageData<ComicCommentEntity> =
-                serde_json::from_value(json["data"]["comments"].clone())
-                    .map_err(|e| anyhow::anyhow!("Failed to parse comic comments data: {}", e))?;
+                serde_json::from_value(json["data"]["comments"].clone()).map_err(|e| {
+                    CustomError {
+                        error_code: CustomErrorType::ParseError,
+                        error_message: format!("Failed to parse comic comments data: {}", e),
+                    }
+                })?;
+
             Ok(ComicCommentPageData::from(page_data))
-        }
-        _ => Err(anyhow::anyhow!(json["message"].clone())),
-    }
+        },
+        "comic comments api result expected text response".to_string(),
+    )
 }
 
 /// 向指定漫画发布评论。
@@ -457,12 +447,12 @@ pub async fn picacg_comic_comments(
 ///
 /// # 返回
 /// - `Ok(())`：评论发布成功。
-/// - `Err(anyhow::Error)`：请求失败或解析失败时返回错误信息。
+/// - `Err(CustomError)`：请求失败或解析失败时返回错误信息。
 #[frb]
 pub async fn picacg_comic_post_comment(
     comic_id: String,
     content: String,
-) -> Result<(), anyhow::Error> {
+) -> Result<(), CustomError> {
     let response = picacg_request(
         "POST",
         &format!("/comics/{}/comments", comic_id),
@@ -470,21 +460,17 @@ pub async fn picacg_comic_post_comment(
         None,
         Some(HttpExpectBody::Text),
     )
-    .await?;
+    .await
+    .map_err(|e| CustomError {
+        error_code: CustomErrorType::BadRequest,
+        error_message: format!("Failed to make request: {}", e),
+    })?;
 
-    let json: Value = match response.body {
-        HttpResponseBody::Text(text) => serde_json::from_str(&text)?,
-        _ => {
-            return Err(anyhow::anyhow!(
-                "post comment api result expected text response"
-            ))
-        }
-    };
-
-    match json["code"].as_i64() {
-        Some(200) => Ok(()),
-        _ => Err(anyhow::anyhow!(json["message"].clone())),
-    }
+    parse_json_from_text(
+        response.body,
+        |_json| Ok(()),
+        "post comment api result expected text response".to_string(),
+    )
 }
 
 /// 向指定评论发布子评论（回复）。
@@ -498,12 +484,12 @@ pub async fn picacg_comic_post_comment(
 ///
 /// # 返回
 /// - `Ok(())`：子评论发布成功。
-/// - `Err(anyhow::Error)`：请求失败或解析失败时返回错误信息。
+/// - `Err(CustomError)`：请求失败或解析失败时返回错误信息。
 #[frb]
 pub async fn picacg_comic_post_child_comment(
     comment_id: String,
     content: String,
-) -> Result<(), anyhow::Error> {
+) -> Result<(), CustomError> {
     let response = picacg_request(
         "POST",
         &format!("/comments/{}", comment_id),
@@ -511,21 +497,17 @@ pub async fn picacg_comic_post_child_comment(
         None,
         Some(HttpExpectBody::Text),
     )
-    .await?;
+    .await
+    .map_err(|e| CustomError {
+        error_code: CustomErrorType::BadRequest,
+        error_message: format!("Failed to make request: {}", e),
+    })?;
 
-    let json: Value = match response.body {
-        HttpResponseBody::Text(text) => serde_json::from_str(&text)?,
-        _ => {
-            return Err(anyhow::anyhow!(
-                "post child comment api result expected text response"
-            ))
-        }
-    };
-
-    match json["code"].as_i64() {
-        Some(200) => Ok(()),
-        _ => Err(anyhow::anyhow!(json["message"].clone())),
-    }
+    parse_json_from_text(
+        response.body,
+        |_json| Ok(()),
+        "post child comment api result expected text response".to_string(),
+    )
 }
 
 /// 使用高级搜索功能搜索漫画。
@@ -542,14 +524,14 @@ pub async fn picacg_comic_post_child_comment(
 ///
 /// # 返回
 /// - `Ok(ComicSearchPageData)`：请求成功并解析成功时返回搜索结果分页数据。
-/// - `Err(anyhow::Error)`：请求失败或解析失败时返回错误信息。
+/// - `Err(CustomError)`：请求失败或解析失败时返回错误信息。
 #[frb]
 pub async fn picacg_comic_search(
     content: String,
     sort: Sort,
     page: i32,
     categories: Vec<String>,
-) -> Result<ComicSearchPageData, anyhow::Error> {
+) -> Result<ComicSearchPageData, CustomError> {
     let response = picacg_request(
         "POST",
         &format!("/comics/advanced-search?page={}", page),
@@ -564,26 +546,27 @@ pub async fn picacg_comic_search(
         None,
         Some(HttpExpectBody::Text),
     )
-    .await?;
+    .await
+    .map_err(|e| CustomError {
+        error_code: CustomErrorType::BadRequest,
+        error_message: format!("Failed to make request: {}", e),
+    })?;
 
-    let json: Value = match response.body {
-        HttpResponseBody::Text(text) => serde_json::from_str(&text)?,
-        _ => {
-            return Err(anyhow::anyhow!(
-                "comic search api result expected text response"
-            ))
-        }
-    };
-
-    match json["code"].as_i64() {
-        Some(200) => {
+    parse_json_from_text(
+        response.body,
+        |json| {
             let page_data: PageData<ComicSearchEntity> =
-                serde_json::from_value(json["data"]["comics"].clone())
-                    .map_err(|e| anyhow::anyhow!("Failed to parse comic search data: {}", e))?;
+                serde_json::from_value(json["data"]["comics"].clone()).map_err(|e| {
+                    CustomError {
+                        error_code: CustomErrorType::ParseError,
+                        error_message: format!("Failed to parse comic search data: {}", e),
+                    }
+                })?;
+
             Ok(ComicSearchPageData::from(page_data))
-        }
-        _ => Err(anyhow::anyhow!(json["message"].clone())),
-    }
+        },
+        "comic search api result expected text response".to_string(),
+    )
 }
 
 #[cfg(test)]

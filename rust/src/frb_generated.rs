@@ -255,7 +255,7 @@ fn wire__crate__api__reqs__comic__picacg_comic_comments_impl(
             let api_page = <i32>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
-                transform_result_sse::<_, flutter_rust_bridge::for_generated::anyhow::Error>(
+                transform_result_sse::<_, crate::api::error::custom_error::CustomError>(
                     (move || async move {
                         let output_ok =
                             crate::api::reqs::comic::picacg_comic_comments(api_comic_id, api_page)
@@ -295,7 +295,7 @@ fn wire__crate__api__reqs__comic__picacg_comic_ep_pictures_impl(
             let api_page = <i32>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
-                transform_result_sse::<_, flutter_rust_bridge::for_generated::anyhow::Error>(
+                transform_result_sse::<_, crate::api::error::custom_error::CustomError>(
                     (move || async move {
                         let output_ok = crate::api::reqs::comic::picacg_comic_ep_pictures(
                             api_comic_id,
@@ -337,7 +337,7 @@ fn wire__crate__api__reqs__comic__picacg_comic_eps_impl(
             let api_page = <i32>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
-                transform_result_sse::<_, flutter_rust_bridge::for_generated::anyhow::Error>(
+                transform_result_sse::<_, crate::api::error::custom_error::CustomError>(
                     (move || async move {
                         let output_ok =
                             crate::api::reqs::comic::picacg_comic_eps(api_comic_id, api_page)
@@ -376,7 +376,7 @@ fn wire__crate__api__reqs__comic__picacg_comic_favourite_impl(
             let api_page = <i32>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
-                transform_result_sse::<_, flutter_rust_bridge::for_generated::anyhow::Error>(
+                transform_result_sse::<_, crate::api::error::custom_error::CustomError>(
                     (move || async move {
                         let output_ok =
                             crate::api::reqs::comic::picacg_comic_favourite(api_sort, api_page)
@@ -414,7 +414,7 @@ fn wire__crate__api__reqs__comic__picacg_comic_info_impl(
             let api_comic_id = <String>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
-                transform_result_sse::<_, flutter_rust_bridge::for_generated::anyhow::Error>(
+                transform_result_sse::<_, crate::api::error::custom_error::CustomError>(
                     (move || async move {
                         let output_ok =
                             crate::api::reqs::comic::picacg_comic_info(api_comic_id).await?;
@@ -456,7 +456,7 @@ fn wire__crate__api__reqs__comic__picacg_comic_page_impl(
             let api_page = <i32>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
-                transform_result_sse::<_, flutter_rust_bridge::for_generated::anyhow::Error>(
+                transform_result_sse::<_, crate::api::error::custom_error::CustomError>(
                     (move || async move {
                         let output_ok = crate::api::reqs::comic::picacg_comic_page(
                             api_category,
@@ -501,7 +501,7 @@ fn wire__crate__api__reqs__comic__picacg_comic_post_child_comment_impl(
             let api_content = <String>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
-                transform_result_sse::<_, flutter_rust_bridge::for_generated::anyhow::Error>(
+                transform_result_sse::<_, crate::api::error::custom_error::CustomError>(
                     (move || async move {
                         let output_ok = crate::api::reqs::comic::picacg_comic_post_child_comment(
                             api_comment_id,
@@ -542,7 +542,7 @@ fn wire__crate__api__reqs__comic__picacg_comic_post_comment_impl(
             let api_content = <String>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
-                transform_result_sse::<_, flutter_rust_bridge::for_generated::anyhow::Error>(
+                transform_result_sse::<_, crate::api::error::custom_error::CustomError>(
                     (move || async move {
                         let output_ok = crate::api::reqs::comic::picacg_comic_post_comment(
                             api_comic_id,
@@ -581,7 +581,7 @@ fn wire__crate__api__reqs__comic__picacg_comic_random_impl(
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
             deserializer.end();
             move |context| async move {
-                transform_result_sse::<_, flutter_rust_bridge::for_generated::anyhow::Error>(
+                transform_result_sse::<_, crate::api::error::custom_error::CustomError>(
                     (move || async move {
                         let output_ok = crate::api::reqs::comic::picacg_comic_random().await?;
                         Ok(output_ok)
@@ -620,7 +620,7 @@ fn wire__crate__api__reqs__comic__picacg_comic_search_impl(
             let api_categories = <Vec<String>>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
-                transform_result_sse::<_, flutter_rust_bridge::for_generated::anyhow::Error>(
+                transform_result_sse::<_, crate::api::error::custom_error::CustomError>(
                     (move || async move {
                         let output_ok = crate::api::reqs::comic::picacg_comic_search(
                             api_content,
@@ -662,7 +662,7 @@ fn wire__crate__api__reqs__comic__picacg_comic_switch_favourite_impl(
             let api_comic_id = <String>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
-                transform_result_sse::<_, flutter_rust_bridge::for_generated::anyhow::Error>(
+                transform_result_sse::<_, crate::api::error::custom_error::CustomError>(
                     (move || async move {
                         let output_ok =
                             crate::api::reqs::comic::picacg_comic_switch_favourite(api_comic_id)
@@ -700,7 +700,7 @@ fn wire__crate__api__reqs__comic__picacg_comic_switch_like_impl(
             let api_comic_id = <String>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
-                transform_result_sse::<_, flutter_rust_bridge::for_generated::anyhow::Error>(
+                transform_result_sse::<_, crate::api::error::custom_error::CustomError>(
                     (move || async move {
                         let output_ok =
                             crate::api::reqs::comic::picacg_comic_switch_like(api_comic_id).await?;
@@ -786,7 +786,7 @@ fn wire__crate__api__reqs__user__picacg_user_login_impl(
             let api_password = <String>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
-                transform_result_sse::<_, flutter_rust_bridge::for_generated::anyhow::Error>(
+                transform_result_sse::<_, crate::api::error::custom_error::CustomError>(
                     (move || async move {
                         let output_ok =
                             crate::api::reqs::user::picacg_user_login(api_username, api_password)
@@ -823,7 +823,7 @@ fn wire__crate__api__reqs__user__picacg_user_profile_impl(
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
             deserializer.end();
             move |context| async move {
-                transform_result_sse::<_, flutter_rust_bridge::for_generated::anyhow::Error>(
+                transform_result_sse::<_, crate::api::error::custom_error::CustomError>(
                     (move || async move {
                         let output_ok = crate::api::reqs::user::picacg_user_profile().await?;
                         Ok(output_ok)
@@ -858,7 +858,7 @@ fn wire__crate__api__reqs__user__picacg_user_punch_in_impl(
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
             deserializer.end();
             move |context| async move {
-                transform_result_sse::<_, flutter_rust_bridge::for_generated::anyhow::Error>(
+                transform_result_sse::<_, crate::api::error::custom_error::CustomError>(
                     (move || async move {
                         let output_ok = crate::api::reqs::user::picacg_user_punch_in().await?;
                         Ok(output_ok)
@@ -904,7 +904,7 @@ fn wire__crate__api__reqs__user__picacg_user_register_impl(
             let api_question3 = <String>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
-                transform_result_sse::<_, flutter_rust_bridge::for_generated::anyhow::Error>(
+                transform_result_sse::<_, crate::api::error::custom_error::CustomError>(
                     (move || async move {
                         let output_ok = crate::api::reqs::user::picacg_user_register(
                             api_email,
@@ -1420,6 +1420,34 @@ impl SseDecode for crate::api::types::creator_entity::CreatorEntity {
             slogan: var_slogan,
             role: var_role,
             character: var_character,
+        };
+    }
+}
+
+impl SseDecode for crate::api::error::custom_error::CustomError {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_errorCode =
+            <crate::api::error::custom_error::CustomErrorType>::sse_decode(deserializer);
+        let mut var_errorMessage = <String>::sse_decode(deserializer);
+        return crate::api::error::custom_error::CustomError {
+            error_code: var_errorCode,
+            error_message: var_errorMessage,
+        };
+    }
+}
+
+impl SseDecode for crate::api::error::custom_error::CustomErrorType {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut inner = <i32>::sse_decode(deserializer);
+        return match inner {
+            0 => crate::api::error::custom_error::CustomErrorType::BadRequest,
+            1 => crate::api::error::custom_error::CustomErrorType::ParameterError,
+            2 => crate::api::error::custom_error::CustomErrorType::ParseJsonError,
+            3 => crate::api::error::custom_error::CustomErrorType::UnKnownError,
+            4 => crate::api::error::custom_error::CustomErrorType::ParseError,
+            _ => unreachable!("Invalid variant for CustomErrorType: {}", inner),
         };
     }
 }
@@ -2265,6 +2293,51 @@ impl flutter_rust_bridge::IntoIntoDart<crate::api::types::creator_entity::Creato
     }
 }
 // Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::api::error::custom_error::CustomError {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.error_code.into_into_dart().into_dart(),
+            self.error_message.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::api::error::custom_error::CustomError
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::api::error::custom_error::CustomError>
+    for crate::api::error::custom_error::CustomError
+{
+    fn into_into_dart(self) -> crate::api::error::custom_error::CustomError {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::api::error::custom_error::CustomErrorType {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        match self {
+            Self::BadRequest => 0.into_dart(),
+            Self::ParameterError => 1.into_dart(),
+            Self::ParseJsonError => 2.into_dart(),
+            Self::UnKnownError => 3.into_dart(),
+            Self::ParseError => 4.into_dart(),
+            _ => unreachable!(),
+        }
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::api::error::custom_error::CustomErrorType
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::api::error::custom_error::CustomErrorType>
+    for crate::api::error::custom_error::CustomErrorType
+{
+    fn into_into_dart(self) -> crate::api::error::custom_error::CustomErrorType {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
 impl flutter_rust_bridge::IntoDart for crate::api::utils::client::HttpExpectBody {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         match self {
@@ -2653,6 +2726,33 @@ impl SseEncode for crate::api::types::creator_entity::CreatorEntity {
         <String>::sse_encode(self.slogan, serializer);
         <String>::sse_encode(self.role, serializer);
         <String>::sse_encode(self.character, serializer);
+    }
+}
+
+impl SseEncode for crate::api::error::custom_error::CustomError {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <crate::api::error::custom_error::CustomErrorType>::sse_encode(self.error_code, serializer);
+        <String>::sse_encode(self.error_message, serializer);
+    }
+}
+
+impl SseEncode for crate::api::error::custom_error::CustomErrorType {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i32>::sse_encode(
+            match self {
+                crate::api::error::custom_error::CustomErrorType::BadRequest => 0,
+                crate::api::error::custom_error::CustomErrorType::ParameterError => 1,
+                crate::api::error::custom_error::CustomErrorType::ParseJsonError => 2,
+                crate::api::error::custom_error::CustomErrorType::UnKnownError => 3,
+                crate::api::error::custom_error::CustomErrorType::ParseError => 4,
+                _ => {
+                    unimplemented!("");
+                }
+            },
+            serializer,
+        );
     }
 }
 
