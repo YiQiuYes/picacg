@@ -1,6 +1,7 @@
 import 'package:go_router/go_router.dart';
 import 'package:picacg/pages/login/login_page.dart';
 import 'package:picacg/pages/main/main_page.dart';
+import 'package:picacg/provider/config_provider.dart';
 
 class RouteConfig {
   static const String main = '/';
@@ -22,6 +23,15 @@ class RouteConfig {
         },
       ),
     ],
+    redirect: (context, state) async {
+      final isAuthenticated = globalConfig.userData.token.isEmpty;
+
+      if (isAuthenticated && state.path != login) {
+        return login;
+      } else {
+        return null;
+      }
+    },
   );
 
   static GoRouter get router => _router;
