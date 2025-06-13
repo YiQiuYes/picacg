@@ -1,13 +1,19 @@
 use flutter_rust_bridge::for_generated::anyhow;
 
+#[derive(Debug)]
 pub enum CustomErrorType {
     BadRequest,
     ParameterError,
     ParseJsonError,
     UnKnownError,
     ParseError,
+    FileReadError,
+    FileWriteError,
+    SerializeJsonError,
+    LockError,
 }
 
+#[derive(Debug)]
 pub struct CustomError {
     pub error_code: CustomErrorType,
     pub error_message: String,

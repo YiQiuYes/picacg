@@ -38,7 +38,7 @@ flutter_rust_bridge::frb_generated_boilerplate!(
     default_rust_auto_opaque = RustAutoOpaqueMoi,
 );
 pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_VERSION: &str = "2.10.0";
-pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = -814440440;
+pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = -1386172676;
 
 // Section: executor
 
@@ -127,35 +127,6 @@ fn wire__crate__api__types__image_entity__avatar_default_impl(
                     Ok(output_ok)
                 })())
             }
-        },
-    )
-}
-fn wire__crate__api__utils__client__get_picacg_token_impl(
-    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
-    rust_vec_len_: i32,
-    data_len_: i32,
-) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec, _>(
-        flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "get_picacg_token",
-            port: None,
-            mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync,
-        },
-        move || {
-            let message = unsafe {
-                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
-                    ptr_,
-                    rust_vec_len_,
-                    data_len_,
-                )
-            };
-            let mut deserializer =
-                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            deserializer.end();
-            transform_result_sse::<_, ()>((move || {
-                let output_ok = Result::<_, ()>::Ok(crate::api::utils::client::get_picacg_token())?;
-                Ok(output_ok)
-            })())
         },
     )
 }
@@ -712,6 +683,37 @@ fn wire__crate__api__reqs__comic__picacg_comic_switch_like_impl(
         },
     )
 }
+fn wire__crate__api__storage__config__picacg_load_config_impl(
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "picacg_load_config",
+            port: None,
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_path = <String>::sse_decode(&mut deserializer);
+            deserializer.end();
+            transform_result_sse::<_, crate::api::error::custom_error::CustomError>((move || {
+                let output_ok = crate::api::storage::config::picacg_load_config(api_path)?;
+                Ok(output_ok)
+            })(
+            ))
+        },
+    )
+}
 fn wire__crate__api__utils__client__picacg_request_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
@@ -757,6 +759,70 @@ fn wire__crate__api__utils__client__picacg_request_impl(
                     .await,
                 )
             }
+        },
+    )
+}
+fn wire__crate__api__storage__config__picacg_save_config_impl(
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "picacg_save_config",
+            port: None,
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_path = <String>::sse_decode(&mut deserializer);
+            deserializer.end();
+            transform_result_sse::<_, crate::api::error::custom_error::CustomError>((move || {
+                let output_ok = crate::api::storage::config::picacg_save_config(api_path)?;
+                Ok(output_ok)
+            })(
+            ))
+        },
+    )
+}
+fn wire__crate__api__storage__config__picacg_set_config_impl(
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "picacg_set_config",
+            port: None,
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_path = <String>::sse_decode(&mut deserializer);
+            let api_config = <crate::api::storage::config::Config>::sse_decode(&mut deserializer);
+            deserializer.end();
+            transform_result_sse::<_, crate::api::error::custom_error::CustomError>((move || {
+                let output_ok =
+                    crate::api::storage::config::picacg_set_config(api_path, api_config)?;
+                Ok(output_ok)
+            })(
+            ))
         },
     )
 }
@@ -975,38 +1041,6 @@ fn wire__crate__api__utils__client__send_request_impl(
                     .await,
                 )
             }
-        },
-    )
-}
-fn wire__crate__api__utils__client__set_picacg_token_impl(
-    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
-    rust_vec_len_: i32,
-    data_len_: i32,
-) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec, _>(
-        flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "set_picacg_token",
-            port: None,
-            mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync,
-        },
-        move || {
-            let message = unsafe {
-                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
-                    ptr_,
-                    rust_vec_len_,
-                    data_len_,
-                )
-            };
-            let mut deserializer =
-                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_token = <String>::sse_decode(&mut deserializer);
-            deserializer.end();
-            transform_result_sse::<_, ()>((move || {
-                let output_ok = Result::<_, ()>::Ok({
-                    crate::api::utils::client::set_picacg_token(api_token);
-                })?;
-                Ok(output_ok)
-            })())
         },
     )
 }
@@ -1391,6 +1425,16 @@ impl SseDecode for crate::api::types::comment_user_entity::CommentUserEntity {
     }
 }
 
+impl SseDecode for crate::api::storage::config::Config {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_userData = <crate::api::storage::user_data::UserData>::sse_decode(deserializer);
+        return crate::api::storage::config::Config {
+            user_data: var_userData,
+        };
+    }
+}
+
 impl SseDecode for crate::api::types::creator_entity::CreatorEntity {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -1447,6 +1491,10 @@ impl SseDecode for crate::api::error::custom_error::CustomErrorType {
             2 => crate::api::error::custom_error::CustomErrorType::ParseJsonError,
             3 => crate::api::error::custom_error::CustomErrorType::UnKnownError,
             4 => crate::api::error::custom_error::CustomErrorType::ParseError,
+            5 => crate::api::error::custom_error::CustomErrorType::FileReadError,
+            6 => crate::api::error::custom_error::CustomErrorType::FileWriteError,
+            7 => crate::api::error::custom_error::CustomErrorType::SerializeJsonError,
+            8 => crate::api::error::custom_error::CustomErrorType::LockError,
             _ => unreachable!("Invalid variant for CustomErrorType: {}", inner),
         };
     }
@@ -1766,6 +1814,14 @@ impl SseDecode for () {
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {}
 }
 
+impl SseDecode for crate::api::storage::user_data::UserData {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_token = <String>::sse_decode(deserializer);
+        return crate::api::storage::user_data::UserData { token: var_token };
+    }
+}
+
 impl SseDecode for usize {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -1789,66 +1845,66 @@ fn pde_ffi_dispatcher_primary_impl(
             rust_vec_len,
             data_len,
         ),
-        4 => wire__crate__api__utils__crypto__hmac_hex_impl(port, ptr, rust_vec_len, data_len),
-        5 => wire__crate__api__init__init_app_impl(port, ptr, rust_vec_len, data_len),
-        6 => wire__crate__api__reqs__comic__picacg_comic_comments_impl(
+        3 => wire__crate__api__utils__crypto__hmac_hex_impl(port, ptr, rust_vec_len, data_len),
+        4 => wire__crate__api__init__init_app_impl(port, ptr, rust_vec_len, data_len),
+        5 => wire__crate__api__reqs__comic__picacg_comic_comments_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        7 => wire__crate__api__reqs__comic__picacg_comic_ep_pictures_impl(
+        6 => wire__crate__api__reqs__comic__picacg_comic_ep_pictures_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        8 => {
+        7 => {
             wire__crate__api__reqs__comic__picacg_comic_eps_impl(port, ptr, rust_vec_len, data_len)
         }
-        9 => wire__crate__api__reqs__comic__picacg_comic_favourite_impl(
+        8 => wire__crate__api__reqs__comic__picacg_comic_favourite_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        10 => {
+        9 => {
             wire__crate__api__reqs__comic__picacg_comic_info_impl(port, ptr, rust_vec_len, data_len)
         }
-        11 => {
+        10 => {
             wire__crate__api__reqs__comic__picacg_comic_page_impl(port, ptr, rust_vec_len, data_len)
         }
-        12 => wire__crate__api__reqs__comic__picacg_comic_post_child_comment_impl(
+        11 => wire__crate__api__reqs__comic__picacg_comic_post_child_comment_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        13 => wire__crate__api__reqs__comic__picacg_comic_post_comment_impl(
+        12 => wire__crate__api__reqs__comic__picacg_comic_post_comment_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        14 => wire__crate__api__reqs__comic__picacg_comic_random_impl(
+        13 => wire__crate__api__reqs__comic__picacg_comic_random_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        15 => wire__crate__api__reqs__comic__picacg_comic_search_impl(
+        14 => wire__crate__api__reqs__comic__picacg_comic_search_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        16 => wire__crate__api__reqs__comic__picacg_comic_switch_favourite_impl(
+        15 => wire__crate__api__reqs__comic__picacg_comic_switch_favourite_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        17 => wire__crate__api__reqs__comic__picacg_comic_switch_like_impl(
+        16 => wire__crate__api__reqs__comic__picacg_comic_switch_like_impl(
             port,
             ptr,
             rust_vec_len,
@@ -1857,28 +1913,28 @@ fn pde_ffi_dispatcher_primary_impl(
         18 => {
             wire__crate__api__utils__client__picacg_request_impl(port, ptr, rust_vec_len, data_len)
         }
-        19 => {
+        21 => {
             wire__crate__api__reqs__user__picacg_user_login_impl(port, ptr, rust_vec_len, data_len)
         }
-        20 => wire__crate__api__reqs__user__picacg_user_profile_impl(
+        22 => wire__crate__api__reqs__user__picacg_user_profile_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        21 => wire__crate__api__reqs__user__picacg_user_punch_in_impl(
+        23 => wire__crate__api__reqs__user__picacg_user_punch_in_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        22 => wire__crate__api__reqs__user__picacg_user_register_impl(
+        24 => wire__crate__api__reqs__user__picacg_user_register_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        23 => wire__crate__api__utils__client__send_request_impl(port, ptr, rust_vec_len, data_len),
+        25 => wire__crate__api__utils__client__send_request_impl(port, ptr, rust_vec_len, data_len),
         _ => unreachable!(),
     }
 }
@@ -1891,8 +1947,15 @@ fn pde_ffi_dispatcher_sync_impl(
 ) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
     // Codec=Pde (Serialization + dispatch), see doc to use other codecs
     match func_id {
-        3 => wire__crate__api__utils__client__get_picacg_token_impl(ptr, rust_vec_len, data_len),
-        24 => wire__crate__api__utils__client__set_picacg_token_impl(ptr, rust_vec_len, data_len),
+        17 => {
+            wire__crate__api__storage__config__picacg_load_config_impl(ptr, rust_vec_len, data_len)
+        }
+        19 => {
+            wire__crate__api__storage__config__picacg_save_config_impl(ptr, rust_vec_len, data_len)
+        }
+        20 => {
+            wire__crate__api__storage__config__picacg_set_config_impl(ptr, rust_vec_len, data_len)
+        }
         _ => unreachable!(),
     }
 }
@@ -2262,6 +2325,23 @@ impl flutter_rust_bridge::IntoIntoDart<crate::api::types::comment_user_entity::C
     }
 }
 // Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::api::storage::config::Config {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [self.user_data.into_into_dart().into_dart()].into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::api::storage::config::Config
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::api::storage::config::Config>
+    for crate::api::storage::config::Config
+{
+    fn into_into_dart(self) -> crate::api::storage::config::Config {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
 impl flutter_rust_bridge::IntoDart for crate::api::types::creator_entity::CreatorEntity {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         [
@@ -2322,6 +2402,10 @@ impl flutter_rust_bridge::IntoDart for crate::api::error::custom_error::CustomEr
             Self::ParseJsonError => 2.into_dart(),
             Self::UnKnownError => 3.into_dart(),
             Self::ParseError => 4.into_dart(),
+            Self::FileReadError => 5.into_dart(),
+            Self::FileWriteError => 6.into_dart(),
+            Self::SerializeJsonError => 7.into_dart(),
+            Self::LockError => 8.into_dart(),
             _ => unreachable!(),
         }
     }
@@ -2475,6 +2559,23 @@ impl flutter_rust_bridge::IntoIntoDart<crate::api::types::profile_entity::Profil
     for crate::api::types::profile_entity::ProfileEntity
 {
     fn into_into_dart(self) -> crate::api::types::profile_entity::ProfileEntity {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::api::storage::user_data::UserData {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [self.token.into_into_dart().into_dart()].into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::api::storage::user_data::UserData
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::api::storage::user_data::UserData>
+    for crate::api::storage::user_data::UserData
+{
+    fn into_into_dart(self) -> crate::api::storage::user_data::UserData {
         self
     }
 }
@@ -2711,6 +2812,13 @@ impl SseEncode for crate::api::types::comment_user_entity::CommentUserEntity {
     }
 }
 
+impl SseEncode for crate::api::storage::config::Config {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <crate::api::storage::user_data::UserData>::sse_encode(self.user_data, serializer);
+    }
+}
+
 impl SseEncode for crate::api::types::creator_entity::CreatorEntity {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -2747,6 +2855,10 @@ impl SseEncode for crate::api::error::custom_error::CustomErrorType {
                 crate::api::error::custom_error::CustomErrorType::ParseJsonError => 2,
                 crate::api::error::custom_error::CustomErrorType::UnKnownError => 3,
                 crate::api::error::custom_error::CustomErrorType::ParseError => 4,
+                crate::api::error::custom_error::CustomErrorType::FileReadError => 5,
+                crate::api::error::custom_error::CustomErrorType::FileWriteError => 6,
+                crate::api::error::custom_error::CustomErrorType::SerializeJsonError => 7,
+                crate::api::error::custom_error::CustomErrorType::LockError => 8,
                 _ => {
                     unimplemented!("");
                 }
@@ -3010,6 +3122,13 @@ impl SseEncode for u8 {
 impl SseEncode for () {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {}
+}
+
+impl SseEncode for crate::api::storage::user_data::UserData {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <String>::sse_encode(self.token, serializer);
+    }
 }
 
 impl SseEncode for usize {

@@ -1,4 +1,4 @@
-use crate::api::utils::crypto::hmac_hex;
+use crate::api::{storage::config::CONFIG, utils::crypto::hmac_hex};
 use chrono::prelude::Local;
 use flutter_rust_bridge::{for_generated::anyhow, frb};
 use reqwest::{
@@ -7,37 +7,25 @@ use reqwest::{
 };
 use reqwest_middleware::{ClientBuilder, ClientWithMiddleware};
 use reqwest_retry::{policies::ExponentialBackoff, RetryTransientMiddleware};
-use std::{
-    str::FromStr,
-    sync::{LazyLock, RwLock},
-    time::Duration,
-};
+use std::{str::FromStr, sync::LazyLock, time::Duration};
 
 const HOST_URL: &str = "https://picaapi.picacomic.com";
 const API_KEY: &str = "C69BAF41DA5ABD1FFEDC6D2FEA56B";
 const NONCE: &str = "b1ab87b4800d4d4590a11701b8551afa";
 const DIGEST_KEY: &str = "~d}$Q7$eIni=V)9\\RK/P.RM4;9[7|@/CA}b~OW!3?EV`:<>M7pddUBL5n|0/*Cn";
 
-struct Client {
-    client: LazyLock<ClientWithMiddleware>,
-    token: RwLock<String>,
-}
-
-static CLIENT: Client = Client {
-    client: LazyLock::new(|| {
-        ClientBuilder::new(
-            reqwest::Client::builder()
-                .danger_accept_invalid_certs(true)
-                .build()
-                .unwrap(),
-        )
-        .with(RetryTransientMiddleware::new_with_policy(
-            ExponentialBackoff::builder().build_with_max_retries(2),
-        ))
-        .build()
-    }),
-    token: RwLock::new(String::new()),
-};
+static CLIENT: LazyLock<ClientWithMiddleware> = LazyLock::new(|| {
+    ClientBuilder::new(
+        reqwest::Client::builder()
+            .danger_accept_invalid_certs(true)
+            .build()
+            .unwrap(),
+    )
+    .with(RetryTransientMiddleware::new_with_policy(
+        ExponentialBackoff::builder().build_with_max_retries(2),
+    ))
+    .build()
+});
 
 #[derive(Debug)]
 pub enum HttpResponseBody {
@@ -73,10 +61,7 @@ pub async fn send_request(
         _ => Method::GET,
     };
 
-    let mut request = CLIENT
-        .client
-        .request(method, url)
-        .timeout(Duration::from_secs(5));
+    let mut request = CLIENT.request(method, url).timeout(Duration::from_secs(5));
     if let Some(headers) = headers {
         for (k, v) in headers {
             let header_name =
@@ -173,7 +158,12 @@ pub async fn picacg_request(
         ),
     ];
 
-    let token = get_picacg_token();
+    let token = if let Ok(config) = CONFIG.read() {
+        config.user_data.token.clone()
+    } else {
+        String::new()
+    };
+
     if !token.is_empty() {
         headers.push(("authorization".to_string(), token));
     }
@@ -190,22 +180,6 @@ pub async fn picacg_request(
         expect_body,
     )
     .await
-}
-
-#[frb(sync)]
-pub fn set_picacg_token(token: String) {
-    if let Ok(mut token_guard) = CLIENT.token.write() {
-        *token_guard = token;
-    }
-}
-
-#[frb(sync)]
-pub fn get_picacg_token() -> String {
-    if let Ok(token_guard) = CLIENT.token.read() {
-        token_guard.clone()
-    } else {
-        String::new()
-    }
 }
 
 #[cfg(test)]
