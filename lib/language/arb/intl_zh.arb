@@ -1,4 +1,5 @@
 {
+    "@@locale": "zh",
     "greeting": "欢迎使用Picacg",
     "login": "登录",
     "register": "注册",
