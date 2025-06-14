@@ -8,7 +8,7 @@ class RouteConfig {
   static const String login = '/login';
 
   static final GoRouter _router = GoRouter(
-    initialLocation: login,
+    initialLocation: main,
     routes: <RouteBase>[
       GoRoute(
         path: main,
