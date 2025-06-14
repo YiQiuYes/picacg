@@ -8,7 +8,7 @@ crate-type = ["cdylib", "staticlib"]
 
 [dependencies]
 flutter_rust_bridge = { version = "=2.10.0", features = ["chrono", "dart-opaque"] }
-reqwest = { version = "0.12.19", features = [
+reqwest = { version = "0.12.20", features = [
     "json",
     "rustls-tls",
     "rustls-tls-webpki-roots",
