@@ -63,6 +63,10 @@ android {
             signingConfig = signingConfigs.getByName("release")
         }
 
+        getByName("profile") {
+            signingConfig = signingConfigs.getByName("release")
+        }
+
         debug {
             signingConfig = signingConfigs.getByName("release")
         }
