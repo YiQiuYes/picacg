@@ -123,6 +123,22 @@ pub async fn picacg_request(
     expect_body: Option<HttpExpectBody>,
 ) -> Result<HttpResponse, anyhow::Error> {
     let time = Local::now().timestamp().to_string();
+    let mut host_url = HOST_URL.to_string();
+    let mut url = url.to_string();
+
+    if url.starts_with("http://") || url.starts_with("https://") {
+        let parts: Vec<&str> = url.splitn(4, '/').collect();
+        if parts.len() > 2 {
+            host_url = parts[0].to_string() + "//" + parts[2];
+        } else {
+            return Err(anyhow::anyhow!("Invalid URL format: {}", url));
+        }
+
+        url = parts
+            .get(3)
+            .map_or_else(|| String::new(), |s| s.to_string());
+    }
+
     let url = match url.starts_with("/") {
         true => url.trim_start_matches("/").to_owned(),
         false => url.to_owned(),
@@ -168,7 +184,7 @@ pub async fn picacg_request(
         headers.push(("authorization".to_string(), token));
     }
 
-    let base_url = Url::parse(HOST_URL)?;
+    let base_url = Url::parse(host_url.to_string().as_str())?;
     let url = base_url.join(url.as_str())?;
 
     send_request(
