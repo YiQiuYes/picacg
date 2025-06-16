@@ -1,10 +1,12 @@
 use crate::api::types::creator_entity::CreatorEntity;
 use crate::api::types::image_entity::ImageEntity;
 use chrono::{DateTime, Utc};
+use flutter_rust_bridge::frb;
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
+#[frb(dart_metadata=("freezed"))]
 pub struct ComicInfoEntity {
     #[serde(rename = "_id")]
     pub id: String,

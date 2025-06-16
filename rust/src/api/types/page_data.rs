@@ -3,11 +3,13 @@ use crate::api::types::{
     comic_ep_entity::ComicEpEntity, comic_ep_picture_entity::ComicEpPictureEntity,
     comic_search_entity::ComicSearchEntity,
 };
+use flutter_rust_bridge::frb;
 use serde::{Deserialize, Serialize};
 use std::num::ParseIntError;
 
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
+#[frb(dart_metadata=("freezed"))]
 pub struct PageData<T> {
     #[serde(deserialize_with = "fuzzy_i32")]
     pub total: i32,
@@ -43,6 +45,7 @@ where
 
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
+#[frb(dart_metadata=("freezed"))]
 pub struct ComicPageData {
     pub total: i32,
     pub limit: i32,
@@ -65,6 +68,7 @@ impl From<PageData<ComicEntity>> for ComicPageData {
 
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
+#[frb(dart_metadata=("freezed"))]
 pub struct ComicEpPageData {
     pub total: i32,
     pub limit: i32,
@@ -87,6 +91,7 @@ impl From<PageData<ComicEpEntity>> for ComicEpPageData {
 
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
+#[frb(dart_metadata=("freezed"))]
 pub struct ComicEpPicturePageData {
     pub total: i32,
     pub limit: i32,
@@ -109,6 +114,7 @@ impl From<PageData<ComicEpPictureEntity>> for ComicEpPicturePageData {
 
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
+#[frb(dart_metadata=("freezed"))]
 pub struct ComicCommentPageData {
     pub total: i32,
     pub limit: i32,
@@ -131,6 +137,7 @@ impl From<PageData<ComicCommentEntity>> for ComicCommentPageData {
 
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
+#[frb(dart_metadata=("freezed"))]
 pub struct ComicSearchPageData {
     pub total: i32,
     pub limit: i32,
