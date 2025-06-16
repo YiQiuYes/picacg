@@ -1,7 +1,7 @@
 use crate::api::types::{
-    comic_comment_entity::ComicCommentEntity, comic_entity::ComicEntity,
-    comic_ep_entity::ComicEpEntity, comic_ep_picture_entity::ComicEpPictureEntity,
-    comic_search_entity::ComicSearchEntity,
+    announcement_entity::AnnouncementEntity, comic_comment_entity::ComicCommentEntity,
+    comic_entity::ComicEntity, comic_ep_entity::ComicEpEntity,
+    comic_ep_picture_entity::ComicEpPictureEntity, comic_search_entity::ComicSearchEntity,
 };
 use flutter_rust_bridge::frb;
 use serde::{Deserialize, Serialize};
@@ -149,6 +149,29 @@ pub struct ComicSearchPageData {
 impl From<PageData<ComicSearchEntity>> for ComicSearchPageData {
     fn from(page_data: PageData<ComicSearchEntity>) -> Self {
         ComicSearchPageData {
+            total: page_data.total,
+            limit: page_data.limit,
+            page: page_data.page,
+            pages: page_data.pages,
+            docs: page_data.docs,
+        }
+    }
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+#[frb(dart_metadata=("freezed"))]
+pub struct AnnouncementPageData {
+    pub total: i32,
+    pub limit: i32,
+    pub page: i32,
+    pub pages: i32,
+    pub docs: Vec<AnnouncementEntity>,
+}
+
+impl From<PageData<AnnouncementEntity>> for AnnouncementPageData {
+    fn from(page_data: PageData<AnnouncementEntity>) -> Self {
+        AnnouncementPageData {
             total: page_data.total,
             limit: page_data.limit,
             page: page_data.page,

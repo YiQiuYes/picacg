@@ -2,6 +2,8 @@ use crate::api::{
     error::custom_error::{CustomError, CustomErrorType},
     types::{
         action_entity::ActionEntity,
+        category_entity::CategoryEntity,
+        category_id::CategoryIdEntity,
         comic_comment_entity::ComicCommentEntity,
         comic_entity::ComicEntity,
         comic_ep_entity::ComicEpEntity,
@@ -12,14 +14,17 @@ use crate::api::{
             ComicCommentPageData, ComicEpPageData, ComicEpPicturePageData, ComicPageData,
             ComicSearchPageData, PageData,
         },
+        recommend_entity::RecommendEntity,
         sort::Sort,
     },
     utils::{
+        client::HttpResponseBody,
         client::{picacg_request, HttpExpectBody},
         parse_json::parse_json_from_text,
     },
 };
 use flutter_rust_bridge::frb;
+use serde_json::Value;
 
 /// 获取随机漫画列表。
 ///
@@ -48,7 +53,7 @@ pub async fn picacg_comic_random() -> Result<Vec<ComicEntity>, CustomError> {
         response.body,
         |json| {
             serde_json::from_value(json["data"]["comics"].clone()).map_err(|e| CustomError {
-                error_code: CustomErrorType::ParseError,
+                error_code: CustomErrorType::ParseJsonError,
                 error_message: format!("Failed to parse comic entity: {}", e),
             })
         },
@@ -127,7 +132,7 @@ pub async fn picacg_comic_page(
             let page_data: PageData<ComicEntity> =
                 serde_json::from_value(json["data"]["comics"].clone()).map_err(|e| {
                     CustomError {
-                        error_code: CustomErrorType::ParseError,
+                        error_code: CustomErrorType::ParseJsonError,
                         error_message: format!("Failed to parse comic page data: {}", e),
                     }
                 })?;
@@ -168,7 +173,7 @@ pub async fn picacg_comic_info(comic_id: String) -> Result<ComicInfoEntity, Cust
         response.body,
         |json| {
             serde_json::from_value(json["data"]["comic"].clone()).map_err(|e| CustomError {
-                error_code: CustomErrorType::ParseError,
+                error_code: CustomErrorType::ParseJsonError,
                 error_message: format!("Failed to parse comic info entity: {}", e),
             })
         },
@@ -208,7 +213,7 @@ pub async fn picacg_comic_eps(comic_id: String, page: i32) -> Result<ComicEpPage
         |json| {
             let page_data: PageData<ComicEpEntity> =
                 serde_json::from_value(json["data"]["eps"].clone()).map_err(|e| CustomError {
-                    error_code: CustomErrorType::ParseError,
+                    error_code: CustomErrorType::ParseJsonError,
                     error_message: format!("Failed to parse comic eps data: {}", e),
                 })?;
 
@@ -258,7 +263,7 @@ pub async fn picacg_comic_ep_pictures(
         |json| {
             let page_data: PageData<ComicEpPictureEntity> =
                 serde_json::from_value(json["data"]["pages"].clone()).map_err(|e| CustomError {
-                    error_code: CustomErrorType::ParseError,
+                    error_code: CustomErrorType::ParseJsonError,
                     error_message: format!("Failed to parse comic ep pictures data: {}", e),
                 })?;
 
@@ -302,7 +307,7 @@ pub async fn picacg_comic_favourite(sort: Sort, page: i32) -> Result<ComicPageDa
             let page_data: PageData<ComicEntity> =
                 serde_json::from_value(json["data"]["comics"].clone()).map_err(|e| {
                     CustomError {
-                        error_code: CustomErrorType::ParseError,
+                        error_code: CustomErrorType::ParseJsonError,
                         error_message: format!("Failed to parse comic favourite data: {}", e),
                     }
                 })?;
@@ -343,7 +348,7 @@ pub async fn picacg_comic_switch_like(comic_id: String) -> Result<ActionEntity, 
         response.body,
         |json| {
             serde_json::from_value(json["data"].clone()).map_err(|e| CustomError {
-                error_code: CustomErrorType::ParseError,
+                error_code: CustomErrorType::ParseJsonError,
                 error_message: format!("Failed to parse action entity: {}", e),
             })
         },
@@ -381,7 +386,7 @@ pub async fn picacg_comic_switch_favourite(comic_id: String) -> Result<ActionEnt
         response.body,
         |json| {
             serde_json::from_value(json["data"].clone()).map_err(|e| CustomError {
-                error_code: CustomErrorType::ParseError,
+                error_code: CustomErrorType::ParseJsonError,
                 error_message: format!("Failed to parse action entity: {}", e),
             })
         },
@@ -425,7 +430,7 @@ pub async fn picacg_comic_comments(
             let page_data: PageData<ComicCommentEntity> =
                 serde_json::from_value(json["data"]["comments"].clone()).map_err(|e| {
                     CustomError {
-                        error_code: CustomErrorType::ParseError,
+                        error_code: CustomErrorType::ParseJsonError,
                         error_message: format!("Failed to parse comic comments data: {}", e),
                     }
                 })?;
@@ -558,7 +563,7 @@ pub async fn picacg_comic_search(
             let page_data: PageData<ComicSearchEntity> =
                 serde_json::from_value(json["data"]["comics"].clone()).map_err(|e| {
                     CustomError {
-                        error_code: CustomErrorType::ParseError,
+                        error_code: CustomErrorType::ParseJsonError,
                         error_message: format!("Failed to parse comic search data: {}", e),
                     }
                 })?;
@@ -569,14 +574,128 @@ pub async fn picacg_comic_search(
     )
 }
 
+/// 获取所有漫画分类。
+///
+/// 该函数会向 `/categories` 接口发起 GET 请求，
+/// 并尝试将返回的 JSON 数据解析为 `Vec<CategoryEntity>`。
+///
+/// # 返回
+/// - `Ok(Vec<CategoryEntity>)`：请求成功并解析成功时返回分类实体列表。
+/// - `Err(CustomError)`：请求失败或解析失败时返回错误信息。
+#[frb]
+pub async fn picacg_comic_category() -> Result<Vec<CategoryEntity>, CustomError> {
+    let response = picacg_request("GET", "/categories", None, None, Some(HttpExpectBody::Text))
+        .await
+        .map_err(|e| CustomError {
+            error_code: CustomErrorType::BadRequest,
+            error_message: format!("Failed to make request: {}", e),
+        })?;
+
+    parse_json_from_text(
+        response.body,
+        |json| {
+            serde_json::from_value(json["data"]["categories"].clone()).map_err(|e| CustomError {
+                error_code: CustomErrorType::ParseJsonError,
+                error_message: format!("Failed to parse category entities: {}", e),
+            })
+        },
+        "category api result expected text response".to_string(),
+    )
+}
+
+/// 获取推荐漫画列表。
+///
+/// 该函数会向 `https://recommend.go2778.com/pic/recommend/get/` 接口发起 GET 请求，
+/// 根据传入的分类 ID 获取推荐漫画列表，并尝试将返回的 JSON 数据解析为 `Vec<RecommendEntity>`。
+///
+/// # 参数
+/// - `category_id`: 分类的唯一标识符。
+///
+/// # 返回
+/// - `Ok(Vec<RecommendEntity>)`：请求成功并解析成功时返回推荐漫画实体列表。
+/// - `Err(CustomError)`：请求失败或解析失败时返回错误信息。
+#[frb]
+pub async fn picacg_comic_recommend(
+    category_id: String,
+) -> Result<Vec<RecommendEntity>, CustomError> {
+    let response = picacg_request(
+        "GET",
+        &format!(
+            "https://recommend.go2778.com/pic/recommend/get/?c={}",
+            category_id
+        ),
+        None,
+        None,
+        Some(HttpExpectBody::Text),
+    )
+    .await
+    .map_err(|e| CustomError {
+        error_code: CustomErrorType::BadRequest,
+        error_message: format!("Failed to make request: {}", e),
+    })?;
+
+    if let HttpResponseBody::Text(text) = response.body {
+        let json: Value = serde_json::from_str(&text).map_err(|e| CustomError {
+            error_code: CustomErrorType::ParseJsonError,
+            error_message: format!("Failed to parse JSON response: {}", e),
+        })?;
+
+        serde_json::from_value(json).map_err(|e| CustomError {
+            error_code: CustomErrorType::ParseJsonError,
+            error_message: format!("Failed to parse recommend entities: {}", e),
+        })
+    } else {
+        Err(CustomError {
+            error_code: CustomErrorType::BadRequest,
+            error_message: "Expected text response from recommend API".to_string(),
+        })
+    }
+}
+
+/// 获取所有漫画分类的 ID 信息。
+///
+/// 该函数会向 `/init?platform=android` 接口发起 GET 请求，
+/// 并尝试将返回的 JSON 数据解析为 `Vec<CategoryIdEntity>`。
+///
+/// # 返回
+/// - `Ok(Vec<CategoryIdEntity>)`：请求成功并解析成功时返回分类 ID 实体列表。
+/// - `Err(CustomError)`：请求失败或解析失败时返回错误信息。
+#[frb]
+pub async fn picacg_comic_category_id() -> Result<Vec<CategoryIdEntity>, CustomError> {
+    let response = picacg_request(
+        "GET",
+        "/init?platform=android",
+        None,
+        None,
+        Some(HttpExpectBody::Text),
+    )
+    .await
+    .map_err(|e| CustomError {
+        error_code: CustomErrorType::BadRequest,
+        error_message: format!("Failed to make request: {}", e),
+    })?;
+
+    parse_json_from_text(
+        response.body,
+        |json| {
+            serde_json::from_value(json["data"]["categories"].clone()).map_err(|e| CustomError {
+                error_code: CustomErrorType::ParseJsonError,
+                error_message: format!("Failed to parse category ID entities: {}", e),
+            })
+        },
+        "category ID api result expected text response".to_string(),
+    )
+}
+
 #[cfg(test)]
 mod tests {
     use crate::api::{
         reqs::comic::{
-            picacg_comic_comments, picacg_comic_ep_pictures, picacg_comic_eps,
-            picacg_comic_favourite, picacg_comic_info, picacg_comic_page,
-            picacg_comic_post_child_comment, picacg_comic_post_comment, picacg_comic_random,
-            picacg_comic_search, picacg_comic_switch_favourite, picacg_comic_switch_like,
+            picacg_comic_category, picacg_comic_category_id, picacg_comic_comments,
+            picacg_comic_ep_pictures, picacg_comic_eps, picacg_comic_favourite, picacg_comic_info,
+            picacg_comic_page, picacg_comic_post_child_comment, picacg_comic_post_comment,
+            picacg_comic_random, picacg_comic_recommend, picacg_comic_search,
+            picacg_comic_switch_favourite, picacg_comic_switch_like,
         },
         types::sort::Sort,
     };
@@ -656,6 +775,24 @@ mod tests {
     #[tokio::test]
     async fn test_picacg_comic_search() {
         let result = picacg_comic_search("test".to_string(), Sort::SORT_DEFAULT, 1, vec![]).await;
+        assert!(result.is_err());
+    }
+
+    #[tokio::test]
+    async fn test_picacg_comic_recommend() {
+        let result = picacg_comic_recommend("5821859b5f6b9a4f93dbf6dd".to_string()).await;
+        assert!(result.is_ok());
+    }
+
+    #[tokio::test]
+    async fn test_picacg_comic_category() {
+        let result = picacg_comic_category().await;
+        assert!(result.is_err());
+    }
+
+    #[tokio::test]
+    async fn test_picacg_comic_category_id() {
+        let result = picacg_comic_category_id().await;
         assert!(result.is_err());
     }
 }

@@ -6,7 +6,6 @@ pub enum CustomErrorType {
     ParameterError,
     ParseJsonError,
     UnKnownError,
-    ParseError,
     FileReadError,
     FileWriteError,
     SerializeJsonError,

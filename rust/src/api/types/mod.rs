@@ -1,4 +1,8 @@
 pub mod action_entity;
+pub mod ad_entity;
+pub mod announcement_entity;
+pub mod category_entity;
+pub mod category_id;
 pub mod comic_comment_entity;
 pub mod comic_entity;
 pub mod comic_ep_entity;
@@ -11,4 +15,5 @@ pub mod image_entity;
 pub mod login_entity;
 pub mod page_data;
 pub mod profile_entity;
+pub mod recommend_entity;
 pub mod sort;
