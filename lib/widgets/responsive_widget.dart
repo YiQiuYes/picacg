@@ -21,4 +21,22 @@ class ResponsiveWidget extends StatelessWidget {
         return mobile ?? SizedBox();
     }
   }
+
+  static T of<T>(
+    BuildContext context, {
+    required T mobile,
+    required T folded,
+    required T tablet,
+  }) {
+    switch (ResponsiveBreakpoints.of(context).breakpoint.name) {
+      case MOBILE:
+        return mobile;
+      case 'FOLDED':
+        return folded;
+      case TABLET:
+        return tablet;
+      default:
+        return mobile;
+    }
+  }
 }

@@ -34,5 +34,17 @@
     "registerBirthdayEmpty": "生日不能为空",
     "registerSexEmpty": "性别不能为空",
     "loginSuccessAndJumpToMain": "登录成功，即将跳转到主界面",
-    "registerSuccessAndJumpToMain": "注册成功，即将跳转到主界面"
+    "registerSuccessAndJumpToMain": "注册成功，即将跳转到主界面",
+    "errorBadRequest": "请求错误",
+    "errorParseJsonError": "Json数据解析错误",
+    "errorParameterError": "请求参数错误",
+    "errorSerializeJsonError": "数据序列化错误",
+    "errorUnKnownError": "未知错误",
+    "errorLockError": "资源繁忙",
+    "errorFileWriteError": "文件写入错误",
+    "errorFileReadError": "文件读取错误",
+    "home": "首页",
+    "category": "分类",
+    "game": "游戏",
+    "personal": "个人"
 }

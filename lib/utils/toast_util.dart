@@ -1,4 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:picacg/language/generated/l10n.dart';
+import 'package:picacg/rust/api/error/custom_error.dart';
 
 class ToastUtil {
   static void showErrorSnackBar({
@@ -43,6 +47,8 @@ class ToastUtil {
     );
   }
 
+  static Timer? _snackBarTimer;
+
   static void showSnackBar({
     required String message,
     required BuildContext context,
@@ -50,6 +56,11 @@ class ToastUtil {
     Color? textColor,
     Color? backgroundColor,
   }) {
+    if (_snackBarTimer != null) {
+      return;
+    }
+
+    ScaffoldMessenger.of(context).removeCurrentSnackBar();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Center(
@@ -72,5 +83,35 @@ class ToastUtil {
         ),
       ),
     );
+
+    _snackBarTimer = Timer(duration, () {
+      _snackBarTimer?.cancel();
+      _snackBarTimer = null;
+    });
+  }
+
+  static String translateErrorMessage(Object error) {
+    if (error is CustomError) {
+      switch (error.errorCode) {
+        case CustomErrorType.badRequest:
+          return Language.current.errorBadRequest;
+        case CustomErrorType.parseJsonError:
+          return Language.current.errorParseJsonError;
+        case CustomErrorType.parameterError:
+          return Language.current.errorParameterError;
+        case CustomErrorType.serializeJsonError:
+          return Language.current.errorSerializeJsonError;
+        case CustomErrorType.unKnownError:
+          return Language.current.errorUnKnownError;
+        case CustomErrorType.lockError:
+          return Language.current.errorLockError;
+        case CustomErrorType.fileWriteError:
+          return Language.current.errorFileWriteError;
+        case CustomErrorType.fileReadError:
+          return Language.current.errorFileReadError;
+      }
+    } else {
+      return error.toString();
+    }
   }
 }
