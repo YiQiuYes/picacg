@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - master
+  pull_request:
+    branches:
+      - master
 
 env:
   FLUTTER_VERSION: '3.32.2'
@@ -19,6 +22,7 @@ jobs:
       KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
       KEY_STORE_PASSWORD: ${{ secrets.KEY_STORE_PASSWORD }}
       SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
+      PULL_REQUEST: ${{ github.event_name == 'pull_request' && 'true' || 'false' }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4

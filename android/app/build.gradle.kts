@@ -59,16 +59,21 @@ android {
     }
 
     buildTypes {
+        var sign = signingConfigs.getByName("release")
+        if (System.getenv("PULL_REQUEST") == "true") {
+            sign = signingConfigs.getByName("debug")
+        }
+
         release {
-            signingConfig = signingConfigs.getByName("release")
+            signingConfig = sign
         }
 
         getByName("profile") {
-            signingConfig = signingConfigs.getByName("release")
+            signingConfig = sign
         }
 
         debug {
-            signingConfig = signingConfigs.getByName("release")
+            signingConfig = sign
         }
     }
 }
