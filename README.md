@@ -8,6 +8,8 @@
 
 ## 📥 安装
 
+> 请确保开发设备已经安装 `rust`
+
 ```bash
 # 克隆仓库
 git clone https://github.com/YiQiuYes/picacg.git picacg
@@ -17,6 +19,15 @@ cd picacg
 
 # 安装依赖
 flutter pub get
+
+# 生成多语言文件
+flutter pub run intl_utils:generate
+
+# 安装 flutter rust 胶水生成器
+cargo instal flutter_rust_bridge_codegen
+
+# 生成胶水代码
+flutter_rust_bridge_codegen generate
 
 # 运行应用
 flutter run
