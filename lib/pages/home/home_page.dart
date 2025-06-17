@@ -2,8 +2,10 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:card_swiper/card_swiper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:picacg/pages/home/home_store.dart';
 import 'package:picacg/provider/comic_provider.dart';
 import 'package:picacg/provider/notice_provider.dart';
+import 'package:picacg/rust/api/types/ad_entity.dart';
 import 'package:picacg/utils/toast_util.dart';
 import 'package:picacg/widgets/responsive_widget.dart';
 
@@ -15,7 +17,7 @@ class HomePage extends ConsumerStatefulWidget {
 }
 
 class _HomePageState extends ConsumerState<HomePage>
-    with AutomaticKeepAliveClientMixin<HomePage> {
+    with AutomaticKeepAliveClientMixin<HomePage>, HomeStore {
   @override
   bool get wantKeepAlive => true;
 
@@ -281,8 +283,23 @@ class _HomePageState extends ConsumerState<HomePage>
             final item = data[index];
 
             return CachedNetworkImage(
-              imageUrl: item.pic,
+              imageUrl: formatImageUrl(item.pic),
               fit: BoxFit.cover,
+              errorWidget: (context, url, error) {
+                return Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    color: Theme.of(context).colorScheme.errorContainer,
+                  ),
+                  child: Center(
+                    child: Icon(
+                      Icons.error,
+                      color: Theme.of(context).colorScheme.error,
+                      size: 50,
+                    ),
+                  ),
+                );
+              },
               imageBuilder: (context, imageProvider) {
                 return Container(
                   decoration: BoxDecoration(
@@ -296,6 +313,7 @@ class _HomePageState extends ConsumerState<HomePage>
                     alignment: Alignment.bottomCenter,
                     child: Container(
                       height: 70,
+                      width: double.infinity,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.only(
                           bottomLeft: Radius.circular(10),
@@ -381,8 +399,7 @@ class _HomePageState extends ConsumerState<HomePage>
                     bottom: 30,
                     child: CachedNetworkImage(
                       width: 120,
-                      imageUrl:
-                          "${item.thumb.fileServer}/static/${item.thumb.path}",
+                      imageUrl: getImageUrl(item.thumb),
                       fit: BoxFit.cover,
                       imageBuilder: (context, imageProvider) {
                         return Container(
@@ -513,12 +530,18 @@ class _HomePageState extends ConsumerState<HomePage>
 
     return announcement.when(
       data: (data) {
+        List<AdEntity> list = [];
+        for (var item in data) {
+          int index = list.indexWhere((e) => e.thumb == item.thumb);
+          if (index == -1) {
+            list.add(item);
+          }
+        }
+
         return Swiper(
           itemBuilder: (context, index) {
-            final item = data[index];
-
             return CachedNetworkImage(
-              imageUrl: "${item.thumb.fileServer}/static/${item.thumb.path}",
+              imageUrl: getImageUrl(list[index].thumb),
               fit: BoxFit.cover,
               imageBuilder: (context, imageProvider) {
                 return Container(
@@ -533,7 +556,7 @@ class _HomePageState extends ConsumerState<HomePage>
               },
             );
           },
-          itemCount: data.length,
+          itemCount: list.length,
           autoplay: true,
           autoplayDelay: 4000,
           scale: 0.8,
