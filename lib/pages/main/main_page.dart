@@ -18,6 +18,8 @@ class MainPage extends ConsumerStatefulWidget {
 class _MainPageState extends ConsumerState<MainPage> with MainStore {
   @override
   Widget build(BuildContext context) {
+    init(ref);
+
     return Scaffold(
       body: Row(
         children: [

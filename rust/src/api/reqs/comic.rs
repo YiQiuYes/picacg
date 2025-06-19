@@ -3,13 +3,13 @@ use crate::api::{
     types::{
         action_entity::ActionEntity,
         category_entity::CategoryEntity,
-        category_id::CategoryIdEntity,
         comic_comment_entity::ComicCommentEntity,
         comic_entity::ComicEntity,
         comic_ep_entity::ComicEpEntity,
         comic_ep_picture_entity::ComicEpPictureEntity,
         comic_info_entity::ComicInfoEntity,
         comic_search_entity::ComicSearchEntity,
+        init_entity::InitEntity,
         page_data::{
             ComicCommentPageData, ComicEpPageData, ComicEpPicturePageData, ComicPageData,
             ComicSearchPageData, PageData,
@@ -609,7 +609,7 @@ pub async fn picacg_comic_category() -> Result<Vec<CategoryEntity>, CustomError>
 /// - `Ok(Vec<CategoryIdEntity>)`：请求成功并解析成功时返回分类 ID 实体列表。
 /// - `Err(CustomError)`：请求失败或解析失败时返回错误信息。
 #[frb]
-pub async fn picacg_comic_category_id() -> Result<Vec<CategoryIdEntity>, CustomError> {
+pub async fn picacg_comic_init() -> Result<InitEntity, CustomError> {
     let response = picacg_request(
         "GET",
         "/init?platform=android",
@@ -626,24 +626,24 @@ pub async fn picacg_comic_category_id() -> Result<Vec<CategoryIdEntity>, CustomE
     parse_json_from_text(
         response.body,
         |json| {
-            serde_json::from_value(json["data"]["categories"].clone()).map_err(|e| CustomError {
+            serde_json::from_value(json["data"].clone()).map_err(|e| CustomError {
                 error_code: CustomErrorType::ParseJsonError,
-                error_message: format!("Failed to parse category ID entities: {}", e),
+                error_message: format!("Failed to parse init entities: {}", e),
             })
         },
-        "category ID api result expected text response".to_string(),
+        "init api result expected text response".to_string(),
     )
 }
 
 #[cfg(test)]
 mod tests {
+    use crate::api::reqs::comic::picacg_comic_init;
     use crate::api::{
         reqs::comic::{
-            picacg_comic_category, picacg_comic_category_id, picacg_comic_comments,
-            picacg_comic_ep_pictures, picacg_comic_eps, picacg_comic_favourite, picacg_comic_info,
-            picacg_comic_page, picacg_comic_post_child_comment, picacg_comic_post_comment,
-            picacg_comic_random, picacg_comic_search, picacg_comic_switch_favourite,
-            picacg_comic_switch_like,
+            picacg_comic_category, picacg_comic_comments, picacg_comic_ep_pictures,
+            picacg_comic_eps, picacg_comic_favourite, picacg_comic_info, picacg_comic_page,
+            picacg_comic_post_child_comment, picacg_comic_post_comment, picacg_comic_random,
+            picacg_comic_search, picacg_comic_switch_favourite, picacg_comic_switch_like,
         },
         types::sort::Sort,
     };
@@ -733,8 +733,8 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_picacg_comic_category_id() {
-        let result = picacg_comic_category_id().await;
+    async fn test_picacg_comic_init() {
+        let result = picacg_comic_init().await;
         assert!(result.is_err());
     }
 }

@@ -1,3 +1,4 @@
+use crate::api::storage::net_data::NetData;
 use crate::api::{
     error::custom_error::{CustomError, CustomErrorType},
     storage::user_data::UserData,
@@ -12,17 +13,28 @@ pub static CONFIG: RwLock<Config> = RwLock::new(Config {
     user_data: UserData {
         token: String::new(),
     },
+    net_data: NetData {
+        image_server: String::new(),
+    },
 });
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Config {
     #[serde(default = "default_user_data")]
     pub user_data: UserData,
+    #[serde(default = "default_net_data")]
+    pub net_data: NetData,
 }
 
 fn default_user_data() -> UserData {
     UserData {
         token: String::new(),
+    }
+}
+
+fn default_net_data() -> NetData {
+    NetData {
+        image_server: String::new(),
     }
 }
 
@@ -38,6 +50,7 @@ pub fn picacg_load_config(path: String) -> Result<Config, CustomError> {
     if !fs::metadata(&file_path).is_ok() {
         let default_config = Config {
             user_data: default_user_data(),
+            net_data: default_net_data(),
         };
 
         let default_config_json =
@@ -76,6 +89,8 @@ pub fn picacg_load_config(path: String) -> Result<Config, CustomError> {
             error_message: format!("Failed to parse config file: {}", e),
         })?;
 
+        println!("Loaded config: {:?}", config);
+
         CONFIG
             .write()
             .map_err(|_| CustomError {
@@ -83,6 +98,14 @@ pub fn picacg_load_config(path: String) -> Result<Config, CustomError> {
                 error_message: "Failed to acquire write lock on CONFIG".to_string(),
             })?
             .user_data = config.user_data;
+
+        CONFIG
+            .write()
+            .map_err(|_| CustomError {
+                error_code: CustomErrorType::LockError,
+                error_message: "Failed to acquire write lock on CONFIG".to_string(),
+            })?
+            .net_data = config.net_data;
 
         Ok(CONFIG
             .read()
@@ -156,6 +179,7 @@ mod tests {
     use crate::api::storage::config::{
         picacg_load_config, picacg_save_config, picacg_set_config, Config, CONFIG_FILE_PATH,
     };
+    use crate::api::storage::net_data::NetData;
     use crate::api::storage::user_data::UserData;
 
     #[test]
@@ -176,6 +200,9 @@ mod tests {
         let config = Config {
             user_data: UserData {
                 token: "test_token".to_string(),
+            },
+            net_data: NetData {
+                image_server: "https://example.com".to_string(),
             },
         };
 

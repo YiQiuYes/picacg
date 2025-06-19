@@ -4,6 +4,14 @@ use serde::{Deserialize, Serialize};
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 #[frb(dart_metadata=("freezed"))]
+pub struct InitEntity {
+    pub image_server: String,
+    pub categories: Vec<CategoryIdEntity>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
+#[frb(dart_metadata=("freezed"))]
 pub struct CategoryIdEntity {
     #[serde(rename = "_id")]
     pub id: String,
