@@ -4,6 +4,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:picacg/language/generated/l10n.dart';
 import 'package:picacg/pages/home/home_store.dart';
 import 'package:picacg/provider/comic_provider.dart';
 import 'package:picacg/provider/notice_provider.dart';
@@ -88,8 +89,8 @@ class _HomePageState extends ConsumerState<HomePage>
       slivers: [
         SliverToBoxAdapter(
           child: _getTitleWidget(
-            title: "拯救哔咔",
-            subtitle: "更多 >",
+            title: Language.of(context).saveBiKa,
+            subtitle: Language.of(context).moreArrow,
             padding: EdgeInsets.only(
               left: paddingLeft,
               top: 40,
@@ -109,8 +110,8 @@ class _HomePageState extends ConsumerState<HomePage>
         ),
         SliverToBoxAdapter(
           child: _getTitleWidget(
-            title: "公告",
-            subtitle: "更多 >",
+            title: Language.of(context).notice,
+            subtitle: Language.of(context).moreArrow,
             padding: EdgeInsets.only(
               left: paddingLeft,
               top: 40,
@@ -129,8 +130,8 @@ class _HomePageState extends ConsumerState<HomePage>
         ),
         SliverToBoxAdapter(
           child: _getTitleWidget(
-            title: "本子推荐",
-            subtitle: "更多 >",
+            title: Language.of(context).bookRecommend,
+            subtitle: Language.of(context).moreArrow,
             padding: EdgeInsets.only(
               left: paddingLeft,
               top: 40,
@@ -247,7 +248,9 @@ class _HomePageState extends ConsumerState<HomePage>
           Duration(milliseconds: 50),
           () => ToastUtil.showErrorSnackBar(
             context: context,
-            message: '加载推荐失败: ${ToastUtil.translateErrorMessage(error)}',
+            message: Language.of(
+              context,
+            ).errorLoadingRecommend(ToastUtil.translateErrorMessage(error)),
           ),
         );
 
@@ -257,7 +260,7 @@ class _HomePageState extends ConsumerState<HomePage>
               onPressed: () {
                 final _ = ref.refresh(picacgComicRandomApiProvider.future);
               },
-              child: Text('重新加载'),
+              child: Text(Language.of(context).reload),
             ),
           ),
         );
@@ -388,7 +391,9 @@ class _HomePageState extends ConsumerState<HomePage>
           Duration(milliseconds: 50),
           () => ToastUtil.showErrorSnackBar(
             context: context,
-            message: '加载公告失败: ${ToastUtil.translateErrorMessage(error)}',
+            message: Language.of(
+              context,
+            ).errorLoadingNotice(ToastUtil.translateErrorMessage(error)),
           ),
         );
 
@@ -400,7 +405,7 @@ class _HomePageState extends ConsumerState<HomePage>
                   picacgNoticeAnnouncementsApiProvider(page: 1).future,
                 );
               },
-              child: Text('重新加载'),
+              child: Text(Language.of(context).reload),
             ),
           ),
         );
@@ -606,7 +611,9 @@ class _HomePageState extends ConsumerState<HomePage>
           Duration(milliseconds: 50),
           () => ToastUtil.showErrorSnackBar(
             context: context,
-            message: '加载广告失败: ${ToastUtil.translateErrorMessage(error)}',
+            message: Language.of(
+              context,
+            ).errorLoadingAd(ToastUtil.translateErrorMessage(error)),
           ),
         );
 
@@ -615,7 +622,7 @@ class _HomePageState extends ConsumerState<HomePage>
             onPressed: () {
               final _ = ref.refresh(adPicacgNoticeAdApiProvider.future);
             },
-            child: Text('重新加载'),
+            child: Text(Language.of(context).reload),
           ),
         );
       },
