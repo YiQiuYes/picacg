@@ -15,5 +15,4 @@ pub mod image_entity;
 pub mod login_entity;
 pub mod page_data;
 pub mod profile_entity;
-pub mod recommend_entity;
 pub mod sort;

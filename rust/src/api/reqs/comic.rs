@@ -14,17 +14,14 @@ use crate::api::{
             ComicCommentPageData, ComicEpPageData, ComicEpPicturePageData, ComicPageData,
             ComicSearchPageData, PageData,
         },
-        recommend_entity::RecommendEntity,
         sort::Sort,
     },
     utils::{
-        client::HttpResponseBody,
         client::{picacg_request, HttpExpectBody},
         parse_json::parse_json_from_text,
     },
 };
 use flutter_rust_bridge::frb;
-use serde_json::Value;
 
 /// 获取随机漫画列表。
 ///
@@ -603,55 +600,6 @@ pub async fn picacg_comic_category() -> Result<Vec<CategoryEntity>, CustomError>
     )
 }
 
-/// 获取推荐漫画列表。
-///
-/// 该函数会向 `https://recommend.go2778.com/pic/recommend/get/` 接口发起 GET 请求，
-/// 根据传入的分类 ID 获取推荐漫画列表，并尝试将返回的 JSON 数据解析为 `Vec<RecommendEntity>`。
-///
-/// # 参数
-/// - `category_id`: 分类的唯一标识符。
-///
-/// # 返回
-/// - `Ok(Vec<RecommendEntity>)`：请求成功并解析成功时返回推荐漫画实体列表。
-/// - `Err(CustomError)`：请求失败或解析失败时返回错误信息。
-#[frb]
-pub async fn picacg_comic_recommend(
-    category_id: String,
-) -> Result<Vec<RecommendEntity>, CustomError> {
-    let response = picacg_request(
-        "GET",
-        &format!(
-            "https://recommend.go2778.com/pic/recommend/get/?c={}",
-            category_id
-        ),
-        None,
-        None,
-        Some(HttpExpectBody::Text),
-    )
-    .await
-    .map_err(|e| CustomError {
-        error_code: CustomErrorType::BadRequest,
-        error_message: format!("Failed to make request: {}", e),
-    })?;
-
-    if let HttpResponseBody::Text(text) = response.body {
-        let json: Value = serde_json::from_str(&text).map_err(|e| CustomError {
-            error_code: CustomErrorType::ParseJsonError,
-            error_message: format!("Failed to parse JSON response: {}", e),
-        })?;
-
-        serde_json::from_value(json).map_err(|e| CustomError {
-            error_code: CustomErrorType::ParseJsonError,
-            error_message: format!("Failed to parse recommend entities: {}", e),
-        })
-    } else {
-        Err(CustomError {
-            error_code: CustomErrorType::BadRequest,
-            error_message: "Expected text response from recommend API".to_string(),
-        })
-    }
-}
-
 /// 获取所有漫画分类的 ID 信息。
 ///
 /// 该函数会向 `/init?platform=android` 接口发起 GET 请求，
@@ -694,8 +642,8 @@ mod tests {
             picacg_comic_category, picacg_comic_category_id, picacg_comic_comments,
             picacg_comic_ep_pictures, picacg_comic_eps, picacg_comic_favourite, picacg_comic_info,
             picacg_comic_page, picacg_comic_post_child_comment, picacg_comic_post_comment,
-            picacg_comic_random, picacg_comic_recommend, picacg_comic_search,
-            picacg_comic_switch_favourite, picacg_comic_switch_like,
+            picacg_comic_random, picacg_comic_search, picacg_comic_switch_favourite,
+            picacg_comic_switch_like,
         },
         types::sort::Sort,
     };
@@ -776,12 +724,6 @@ mod tests {
     async fn test_picacg_comic_search() {
         let result = picacg_comic_search("test".to_string(), Sort::SORT_DEFAULT, 1, vec![]).await;
         assert!(result.is_err());
-    }
-
-    #[tokio::test]
-    async fn test_picacg_comic_recommend() {
-        let result = picacg_comic_recommend("5821859b5f6b9a4f93dbf6dd".to_string()).await;
-        assert!(result.is_ok());
     }
 
     #[tokio::test]
