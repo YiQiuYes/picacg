@@ -635,15 +635,36 @@ pub async fn picacg_comic_init() -> Result<InitEntity, CustomError> {
     )
 }
 
+#[frb]
+pub async fn picacg_comic_keywords() -> Result<Vec<String>, CustomError> {
+    let response = picacg_request("GET", "/keywords", None, None, Some(HttpExpectBody::Text))
+        .await
+        .map_err(|e| CustomError {
+            error_code: CustomErrorType::BadRequest,
+            error_message: format!("Failed to make request: {}", e),
+        })?;
+
+    parse_json_from_text(
+        response.body,
+        |json| {
+            serde_json::from_value(json["data"]["keywords"].clone()).map_err(|e| CustomError {
+                error_code: CustomErrorType::ParseJsonError,
+                error_message: format!("Failed to parse keywords: {}", e),
+            })
+        },
+        "comic keywords api result expected text response".to_string(),
+    )
+}
+
 #[cfg(test)]
 mod tests {
-    use crate::api::reqs::comic::picacg_comic_init;
     use crate::api::{
         reqs::comic::{
             picacg_comic_category, picacg_comic_comments, picacg_comic_ep_pictures,
-            picacg_comic_eps, picacg_comic_favourite, picacg_comic_info, picacg_comic_page,
-            picacg_comic_post_child_comment, picacg_comic_post_comment, picacg_comic_random,
-            picacg_comic_search, picacg_comic_switch_favourite, picacg_comic_switch_like,
+            picacg_comic_eps, picacg_comic_favourite, picacg_comic_info, picacg_comic_init,
+            picacg_comic_keywords, picacg_comic_page, picacg_comic_post_child_comment,
+            picacg_comic_post_comment, picacg_comic_random, picacg_comic_search,
+            picacg_comic_switch_favourite, picacg_comic_switch_like,
         },
         types::sort::Sort,
     };
@@ -735,6 +756,12 @@ mod tests {
     #[tokio::test]
     async fn test_picacg_comic_init() {
         let result = picacg_comic_init().await;
+        assert!(result.is_err());
+    }
+
+    #[tokio::test]
+    async fn test_picacg_comic_keywords() {
+        let result = picacg_comic_keywords().await;
         assert!(result.is_err());
     }
 }
