@@ -25,13 +25,16 @@ class _MainPageState extends ConsumerState<MainPage> with MainStore {
         children: [
           ResponsiveWidget(
             tablet: _getRailNavigationWidget(),
-            folded: _getRailNavigationWidget(),
+            folded: SizedBox(),
+            foldedLandscape: _getRailNavigationWidget(),
           ),
           Expanded(child: _getBodyWidget()),
         ],
       ),
       bottomNavigationBar: ResponsiveWidget(
         mobile: _getBottomNavigationBarWidget(),
+        folded: _getBottomNavigationBarWidget(),
+        foldedLandscape: SizedBox(),
       ),
     );
   }
@@ -42,7 +45,8 @@ class _MainPageState extends ConsumerState<MainPage> with MainStore {
       scrollDirection: ResponsiveWidget.of(
         context,
         mobile: Axis.horizontal,
-        folded: Axis.vertical,
+        folded: Axis.horizontal,
+        foldedLandscape: Axis.vertical,
         tablet: Axis.vertical,
       ),
       physics: const NeverScrollableScrollPhysics(),

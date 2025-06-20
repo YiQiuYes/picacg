@@ -46,7 +46,7 @@ class _HomePageState extends ConsumerState<HomePage>
           paddingRight: 25,
           swiperShowCount: 2,
           noticeCrossAxisCount: 2,
-          noticeChildAspectRatio: 1.2,
+          noticeChildAspectRatio: 1.5,
           noticeMaxItemCount: 4,
           recommendCrossAxisCount: 3,
           recommendChildAspectRatio: 0.65,
@@ -103,7 +103,7 @@ class _HomePageState extends ConsumerState<HomePage>
           padding: EdgeInsets.only(left: paddingLeft, right: paddingRight),
           sliver: SliverToBoxAdapter(
             child: SizedBox(
-              height: 180,
+              height: 150,
               child: _getSwiperWidget(showCount: swiperShowCount),
             ),
           ),

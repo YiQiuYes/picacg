@@ -24,3 +24,12 @@ Future<List<ComicEntity>> picacgComicRandomApi(Ref ref) async {
     rethrow;
   }
 }
+
+@riverpod
+Future<List<String>> picacgComicKeywordsApi(Ref ref) async {
+  try {
+    return await picacgComicKeywords();
+  } on CustomError {
+    rethrow;
+  }
+}

@@ -54,5 +54,7 @@
     "errorLoadingRecommend": "加载推荐失败：{error}",
     "errorLoadingNotice": "加载公告失败：{error}",
     "errorLoadingAd": "加载广告失败：{error}",
-    "reload": "重新加载"
+    "reload": "重新加载",
+    "errorLoadingCategory": "加载分类失败：{error}",
+    "errorLoadingKeywords": "加载关键词失败：{error}"
 }
