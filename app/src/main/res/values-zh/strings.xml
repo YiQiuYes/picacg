@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">picacg</string>
+    <string name="navigation_drawer">导航抽屉</string>
+    <string name="close_navigation_drawer">关闭抽屉</string>
+    <string name="tab_home">首页</string>
+    <string name="tab_category">分类</string>
+    <string name="tab_game">游戏</string>
+    <string name="tab_person">个人</string>
+
+    <string name="search">搜索</string>
+    <string name="login">登录</string>
+    <string name="welcome_tip">欢迎使用绅士软件</string>
+    <string name="username">用户名</string>
+    <string name="password">密码</string>
+    <string name="forgot_password">忘记密码？</string>
+    <string name="username_valid">请输入有效的用户名或邮箱</string>
+    <string name="password_valid">密码长度必须大于等于6个字符</string>
+    <string name="no_account_tip">没有账号？</string>
+    <string name="register">注册</string>
+    <string name="comic_detail">漫画信息</string>
+    <string name="chapter">章节列表</string>
+    <string name="comment">评论</string>
+</resources>

@@ -1,0 +1,23 @@
+<resources>
+    <string name="app_name">picacg</string>
+    <string name="navigation_drawer">Navigation Drawer</string>
+    <string name="close_navigation_drawer">Close drawer</string>
+    <string name="tab_home">Home</string>
+    <string name="tab_category">Category</string>
+    <string name="tab_game">Game</string>
+    <string name="tab_person">Person</string>
+
+    <string name="search">Search</string>
+    <string name="login">Login</string>
+    <string name="welcome_tip">Welcome to use Gentleman Software</string>
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+    <string name="forgot_password">Forgot Password?</string>
+    <string name="username_valid">Please enter a valid username or email address</string>
+    <string name="password_valid">The password must be 6 characters or more in length</string>
+    <string name="no_account_tip">Don\'t have an account?</string>
+    <string name="register">Register</string>
+    <string name="comic_detail">Comic</string>
+    <string name="chapter">Chapter</string>
+    <string name="comment">Comment</string>
+</resources>
